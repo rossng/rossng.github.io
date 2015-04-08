@@ -1,0 +1,160 @@
+body {
+  color: #111;
+  font-family: 'Source Sans Pro', sans-serif;
+  margin: 0;
+}
+
+#main {
+  margin: 0 auto;
+  width: 60%;
+}
+
+h1 {
+  display: inline;
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 22px;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  width: 20%;
+}
+
+  h1.deselected a {
+    text-decoration: none;
+  }
+
+  h1 a:visited {
+    color: #111;
+  }
+
+h2 {
+  font-size: 34px;
+  margin: 28px 0 0;
+}
+
+  h2 a {
+    text-decoration: none;
+  }
+
+/* LINKS */
+
+a:link {
+  color: #222;
+}
+
+a:visited {
+  color: #444;
+}
+
+a:hover {
+  color: black;
+}
+
+p.continue {
+  text-align: right;
+}
+
+  p.continue a:after {
+    content: ' \BB';
+  }
+
+/* HEADER */
+
+header.page-header {
+  margin: 100px 0;
+}
+
+/* NAVIGATION */
+
+nav.main-menu {
+  display: inline;
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  width: 60%;
+}
+
+  nav.main-menu ul {
+    display: inline;
+    margin-left: 20px;
+    padding: 0;
+    width: 60%;
+  }
+
+  nav.main-menu li {
+    display: inline;
+    margin-left: 30px;
+  }
+
+  nav.main-menu li a {
+    text-decoration: none;
+  }
+
+    nav.main-menu li a:visited {
+      color: #111;
+    }
+
+  nav.main-menu li.selected {
+    text-decoration: underline;
+  }
+
+/* BLOG POSTS */
+
+article.post p {
+  line-height: 24px;
+}
+
+div.post-info {
+  color: #555;
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+  div.post-info a {
+    color: #555;
+  }
+
+  div.post-info ul.post-tags {
+    display: inline;
+    margin: 0;
+    margin-left: 2px;
+    padding: 0;
+  }
+
+  div.post-info ul.post-tags li {
+    display: inline;
+    text-decoration: underline;
+  }
+
+/* STICKY FOOTER */
+
+footer#page-footer {
+  background-color: #eee;
+  color: #444;
+  text-align: center;
+}
+
+  footer#page-footer p {
+    padding-top: 30px;
+    padding-left: 50px;
+  }
+
+html, body {height: 100%;}
+
+#wrap {min-height: 100%; padding-bottom: 150px;}
+
+#main {overflow:auto;}  /* must be same height as the footer */
+
+  footer#page-footer {position: relative;
+    margin-top: -100px; /* negative value of footer height */
+    height: 100px;
+    clear:both;}
+
+    /*Opera Fix*/
+    body:before {
+      content:"";
+      height:100%;
+      float:left;
+      width:0;
+      margin-top:-32767px;
+    }
