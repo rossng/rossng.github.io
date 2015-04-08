@@ -4,8 +4,15 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+Hi, I'm Ross.
 
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
+I'm currently studying Computer Science at the University of Bristol.
 
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
+Contact me on [LinkedIn](https://uk.linkedin.com/pub/ross-gardiner/78/907/1) or [send me an email](https://rossng.wufoo.com/forms/zn9ppwt13qconp/).
+
+## Colophon
+
+This site was built with:
+
+* Jekyll
+* GitHub Pages
