@@ -6,7 +6,7 @@ layout: default
     <article class="post">
         <h2><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
         <div class="post-info">
-        <time datetime="{{ post.date | date: "%Y-%M-%d" }}">{{ post.date | date: "%Y-%M-%d" }}</time>
+        <time datetime="{{ post.date | date: "%Y-%M-%d" }}">{{ post.date | date: "%Y-%m-%d" }}</time>
         <ul class="post-tags">
             {% for tag in post.tags %}
                 <li><a href="{{ site.baseurl }}/tag/{{ tag }}">{{ tag }}</a></li>

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "System.out.println(""Hello, world"");"
+title:  "System.out.println(\"Hello, world\");"
 date:   2015-04-11 22:36:00
 categories: meta
 ---
