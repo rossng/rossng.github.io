@@ -14,5 +14,5 @@ Contact me on [LinkedIn](https://uk.linkedin.com/pub/ross-gardiner/78/907/1) or 
 
 This site was built with:
 
-* Jekyll
-* GitHub Pages
+* [Jekyll](http://jekyllrb.com/)
+* [GitHub Pages](https://pages.github.com/)
