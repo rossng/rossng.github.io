@@ -14,12 +14,12 @@ layout: default
   var saveForm = function() {
     var restaurantId = document.getElementById("justearn-restaurantid").value;
     if (restaurantId === null || restaurantId.length < 1) {
-      location.href = 'pebblejs:///close';
+      window.location = 'pebblejs:///close';
     }
     else {
       var options = { restaurantId : parseInt(restaurantId) };
       var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
-      window.location.href = url;
+      window.location = url;
     }
   };
 </script>
