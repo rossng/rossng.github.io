@@ -13,6 +13,6 @@ layout: default
 <script type="text/javascript">
   var saveForm = function() {
     var options = { restaurantId : parseInt(document.getElementById("justearn-restaurantid").value) };
-    document.location = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+    document.location.href = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
   };
 </script>
