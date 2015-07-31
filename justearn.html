@@ -12,7 +12,13 @@ layout: default
 
 <script type="text/javascript">
   var saveForm = function() {
-    var options = { restaurantId : parseInt(document.getElementById("justearn-restaurantid").value) };
-    document.location.href = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+    var restaurantId = document.getElementById("justearn-restaurantid").value;
+    if (restaurantId === null || restaurantId.length < 1) {
+      location.href = 'pebblejs://close';
+    }
+    else {
+      var options = { restaurantId : parseInt() };
+      location.href = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+    }
   };
 </script>
