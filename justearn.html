@@ -8,7 +8,7 @@ layout: default
       document.location = 'pebblejs://close';
     }
     else {
-      var options = { restaurantId : parseInt(restaurantId) };
+      var options = { 'restaurantId' : parseInt(restaurantId) };
       var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
       document.location = url;
     }
