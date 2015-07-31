@@ -1,6 +1,19 @@
 ---
 layout: default
 ---
+<script type="text/javascript">
+  var saveForm = function() {
+    var restaurantId = document.getElementById("justearn-restaurantid").value;
+    if (restaurantId === null || restaurantId.length < 1) {
+      document.location = 'pebblejs://close';
+    }
+    else {
+      var options = { restaurantId : parseInt(restaurantId) };
+      var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+      document.location = url;
+    }
+  };
+</script>
 
 <form>
   <label>
@@ -9,17 +22,3 @@ layout: default
   </label>
   <button onclick="saveForm()">Save</button>
 </form>
-
-<script type="text/javascript">
-  var saveForm = function() {
-    var restaurantId = document.getElementById("justearn-restaurantid").value;
-    if (restaurantId === null || restaurantId.length < 1) {
-      window.location = 'pebblejs:///close';
-    }
-    else {
-      var options = { restaurantId : parseInt(restaurantId) };
-      var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
-      window.location = url;
-    }
-  };
-</script>
