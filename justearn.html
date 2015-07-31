@@ -18,7 +18,8 @@ layout: default
     }
     else {
       var options = { restaurantId : parseInt(restaurantId) };
-      location.href = 'pebblejs:///close#' + encodeURIComponent(JSON.stringify(options));
+      var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+      window.location.href = url;
     }
   };
 </script>
