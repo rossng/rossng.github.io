@@ -5,15 +5,17 @@ layout: default
   var saveForm = function() {
     var restaurantId = document.getElementById("justearn-restaurantid").value;
     if (restaurantId === null || restaurantId.length < 1) {
-      document.location = 'pebblejs://close';
+      document.location.href = 'pebblejs://close#';
     }
     else {
       var options = { 'restaurantId' : parseInt(restaurantId) };
       var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
-      document.location = url;
+      document.location.href = url;
     }
   };
 </script>
+
+<p>1</p>
 
 <form>
   <label>
