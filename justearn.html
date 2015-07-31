@@ -1,0 +1,18 @@
+---
+layout: default
+---
+
+<form>
+  <label>
+    <span>Restaurant ID</span>
+    <input type="number" placeholder="4073" id="justearn-restaurantid" />
+  </label>
+  <button onclick="saveForm()">Save</button>
+</form>
+
+<script>
+  var saveForm = function() {
+    var options = { restaurantId = parseInt(document.getElementById("justearn-restaurantid").value) };
+    document.location = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+  }
+</script>
