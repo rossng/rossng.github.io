@@ -1,0 +1,28 @@
+---
+layout: default
+---
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<p>3</p>
+
+<form>
+  <label>
+    <span>Restaurant ID</span>
+    <input type="number" placeholder="4073" id="justearn-restaurantid" />
+  </label>
+  <button id="submit-button">Save</button>
+</form>
+
+<script type="text/javascript">
+  $("#submit-button").click(function () {
+    var restaurantId = document.getElementById("justearn-restaurantid").value;
+    if (restaurantId === null || restaurantId.length < 1) {
+      document.location = 'pebblejs://close#';
+    }
+    else {
+      var options = { 'restaurantId' : parseInt(restaurantId) };
+      var url = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(options));
+      document.location = url;
+    }
+  }
+</script>
