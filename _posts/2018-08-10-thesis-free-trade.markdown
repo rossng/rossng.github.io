@@ -5,6 +5,8 @@ date: 2018-08-10 12:00:00 +0000
 categories: projects
 
 ---
+I've finally got around to publishing my masters thesis in computer science from the University of Bristol.
+
 **Quick link:** [Free Trade: Composable Smart Contracts](https://www.researchgate.net/publication/326693413_Free_Trade_Composable_Smart_Contracts)
 
 ### Talking about contracts
