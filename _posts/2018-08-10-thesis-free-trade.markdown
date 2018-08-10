@@ -48,7 +48,9 @@ More complex contracts can be used for transferring ETH, the Ethereum currency, 
 
 ### Implementing Merchant
 
-I was interested to see if the two technologies - a declarative contract language and smart contracts - could be combined in a useful way. It turned out that there had been some work in this area by the authors of [Findel](http://publications.uni.lu/bitstream/10993/30975/1/Findel_2017-03-08-CR.pdf), but I wanted to prototype an implementation with more advanced features.
+I was interested to see if the two technologies - a declarative contract language and smart contracts - could be combined in a useful way. After all, wouldn't it be useful to be able to write financial smart contracts in a totally declarative way, with no room for errors? It's all to easy to make a [nasty mistake](https://en.wikipedia.org/wiki/The_DAO_(organization)) when you try to write contracts by hand.
+
+It turned out that there had been some work in this area by the authors of [Findel](http://publications.uni.lu/bitstream/10993/30975/1/Findel_2017-03-08-CR.pdf), but I wanted to prototype an implementation with more advanced features.
 
 I re-implemented the composing contracts language as a free monadic deep embedding in Haskell, then wrote a [compiler from the contract language to the Solidity smart contract language](https://github.com/rossng/merchant/). A user can write a contract that looks like the Haskell examples above and compile it directly to Solidity or to a deployable smart contract package.
 
@@ -58,7 +60,7 @@ Of course, that isn't quite enough: we need some way of deploying and managing t
 
 ### Evaluation
 
-Is this a viable method for writing Ethereum financial contracts? Well, not today. Ethereum has a few key limitations that make financial contracts quite hard to replicate. 
+Is this a viable method for writing Ethereum financial contracts? Well, not today. Ethereum has a few key limitations that make financial contracts quite hard to replicate.
 
 First, it cannot trigger execution of a contract autonomously. That means that contracts cannot perform an action in response to some event. A user must trigger them, at which point the contract can verify that the event has occurred and execute.
 
