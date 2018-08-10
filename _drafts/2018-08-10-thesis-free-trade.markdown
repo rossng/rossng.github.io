@@ -62,6 +62,8 @@ Is this a viable method for writing Ethereum financial contracts? Well, not toda
 
 First, it cannot trigger execution of a contract autonomously. That means that contracts cannot perform an action in response to some event. A user must trigger them, at which point the contract can verify that the event has occurred and execute.
 
-Second, there is no widely accepted mechanism for debt enforcement. My prototype implementation simply uses a signed integer balance, not an ERC-20 token
+Second, there is no widely accepted mechanism for debt enforcement. My prototype implementation simply uses a signed integer balance, not an ERC-20/223 token or ETH itself, but a real world financial market needs debt to function.
 
-I hope someone finds this useful! Head over and read the full thesis at [ResearchGate ](https://www.researchgate.net/publication/326693413_Free_Trade_Composable_Smart_Contracts)or [Internet Archive](https://archive.org/details/free-trade-composable-smart-contracts). [Get in touch](http://www.rossng.eu/about/) or create a GitHub issue if you have any questions.
+The current compiler is not optimising enough for real-world use. In particular, the need to store and test the entire history of observable values is very inefficient and will quickly hit the transaction gas limit.
+
+If you want to know more, I would of course highly recommend reading the full thesis at [ResearchGate ](https://www.researchgate.net/publication/326693413_Free_Trade_Composable_Smart_Contracts)or [Internet Archive](https://archive.org/details/free-trade-composable-smart-contracts) 😉. [Get in touch](http://www.rossng.eu/about/) or create a GitHub issue if you have any questions.
