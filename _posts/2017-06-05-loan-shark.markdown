@@ -2,7 +2,7 @@
 layout: post
 title:  "Loan Shark"
 date:   2017-06-05 18:17:00
-categories: meta
+categories: projects
 ---
 Here are some pictures of a game we built with Unity!
 
