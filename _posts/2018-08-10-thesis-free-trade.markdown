@@ -11,7 +11,7 @@ categories: projects
 
 In 2000, Simon Peyton Jones et al. proposed a [new combinator language](https://www.microsoft.com/en-us/research/publication/composing-contracts-an-adventure-in-financial-engineering/) for describing financial contracts. In fact, they appear to have thought this was such a good idea that Peyton Jones and Eber went on to redesign the language and write a [book chapter](https://www.microsoft.com/en-us/research/wp-content/uploads/2000/09/pj-eber.pdf) about it.
 
-![](https://screenshotscdn.firefoxusercontent.com/images/0a0f7be5-c9f5-4c81-af95-395e7aab3262.png)
+![](https://screenshotscdn.firefoxusercontent.com/images/468a0dae-ae6e-4bb0-82af-0c1cff9a66f7.png)
 
 This expressive domain-specific language was designed to improve on the cumbersome representations of financial contracts used in traditional IT systems. The ultimate goal? It should be possible for financial domain experts to author and analyse contracts without waiting for custom implementation by programmers. For example, you can write a European:
 
