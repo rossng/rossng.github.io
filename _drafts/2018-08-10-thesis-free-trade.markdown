@@ -12,3 +12,17 @@ This expressive domain-specific language was designed to improve on the cumberso
 In July 2015, the Ethereum network was launched. Inspired by Bitcoin's distributed 'blockchain' ledger, Ethereum introduced a critical new feature: smart contracts. In addition to currency transfers, Ethereum allowed network participants to author and deploy actual programs to the blockchain. These smart contracts are now being experimentally applied in a number of areas: [prediction markets](https://gnosis.pm/), [stable currencies](https://makerdao.com/) and so on.
 
 I was interested to see if the two technologies - a declarative contract language and smart contracts - could be combined in a useful way. It turned out that there had been some work in this area by the authors of [Findel](http://publications.uni.lu/bitstream/10993/30975/1/Findel_2017-03-08-CR.pdf), but I wanted to prototype an implementation with more advanced features.
+
+I re-implemented the composing contracts language as a free monadic deep embedding in Haskell, then wrote a compiler from the contract language to the Solidity smart contract language. Now, you can write a European option:
+
+    european :: Date -> Contract -> Contract
+    european t u = when (at t) (u ` or ` zero )
+
+Or an American option:
+
+    american :: (Date, Date) -> Contract -> Contract
+    american (t1,t2) u = anytime (between t1 t2) u
+
+And have it compile straight to Solidity!
+
+Of course, that isn't quite enough: we need some way of deploying these contracts to an Ethereum network. I also prototyped a Đapp for deploying, proposing and accepting contracts.
