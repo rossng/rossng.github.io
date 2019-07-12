@@ -7,3 +7,6 @@ github_username:  rossng
 
 # Build settings
 markdown: kramdown
+
+collections:
+  - cv_entries

@@ -1,5 +1,6 @@
 ---
 layout: default
+custom_head: <link rel="alternate" type="application/rss+xml" title="Partially Applied posts" href="/feed.xml" />
 ---
 
 {% for post in site.posts %}
@@ -17,5 +18,5 @@ layout: default
     </article>
 {% endfor %}
 
-<p class="rss-subscribe continue">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+<p class="rss-subscribe"><a href="{{ "/feed.xml" | prepend: site.baseurl }}" title="RSS Feed"><i class="fas fa-rss"></i></a></p>
 
