@@ -28,3 +28,5 @@ fields:
   name: categories
   label: categories
   description: Post categories
+pages:
+- _posts/test-trusted-development.md
