@@ -29,4 +29,5 @@ fields:
   label: categories
   description: Post categories
 pages:
+- _posts/my-first-llvm-program.md
 - _posts/test-trusted-development.md
