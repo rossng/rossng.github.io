@@ -4,5 +4,11 @@
 
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import
-        "style"
+        "style",
+        "footer",
+        "header",
+        "post",
+        "typography",
+        "rss-subscribe",
+        "syntax-highlighting"
 ;

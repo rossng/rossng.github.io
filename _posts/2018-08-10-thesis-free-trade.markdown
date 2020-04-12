@@ -17,36 +17,44 @@ In 2000, Simon Peyton Jones et al. proposed a [new combinator language](https://
 
 This expressive domain-specific language was designed to improve on the cumbersome representations of financial contracts used in traditional IT systems. The ultimate goal? It should be possible for financial domain experts to author and analyse contracts without waiting for custom implementation by programmers. For example, you can write a European:
 
-    european :: Date -> Contract -> Contract
-    european t u = when (at t) (u ` or ` zero )
+```haskell
+european :: Date -> Contract -> Contract
+european t u = when (at t) (u ` or ` zero )
+```
 
 Or an American option:
 
-    american :: (Date, Date) -> Contract -> Contract
-    american (t1,t2) u = anytime (between t1 t2) u
+```haskell
+american :: (Date, Date) -> Contract -> Contract
+american (t1,t2) u = anytime (between t1 t2) u
+```
 
 In just a line or two of code - and these constructs can themselves be embedded and reused in other contracts. More excitingly, we can have contracts that dynamically change over time in response to outside stimuli. Here's one that simply scales up and down with respect to some observable _volatilityIndex_.
 
-    c7 :: Currency -> Contract
-    c7 k = scale volatilityIndex (one k)
+```haskell
+c7 :: Currency -> Contract
+c7 k = scale volatilityIndex (one k)
+```
 
 ### Smart contracts
 
 In July 2015, the Ethereum network was launched. Inspired by Bitcoin's distributed 'blockchain' ledger, Ethereum introduced a critical new feature: smart contracts. In addition to currency transfers, Ethereum allowed network participants to author and deploy actual programs to the blockchain. These smart contracts are now being experimentally applied in a number of areas: [prediction markets](https://gnosis.pm/), [stable currencies](https://makerdao.com/) and so on. Here's a trivial example: a contract which stores an unsigned integer. Any network participant can set or get the number.
 
-    pragma solidity ^0.4.23;
-    
-    contract SimpleStorage {
-      uint storedData;
-      
-      function set( uint x) public {
-        storedData = x;
-      }
-      
-      function get() public constant returns ( uint ) {
-        return storedData;
-      }
-    }
+```solidity
+pragma solidity ^0.4.23;
+
+contract SimpleStorage {
+  uint storedData;
+  
+  function set( uint x) public {
+    storedData = x;
+  }
+  
+  function get() public constant returns ( uint ) {
+    return storedData;
+  }
+}
+```
 
 More complex contracts can be used for transferring ETH, the Ethereum currency, and representing structures such as auctions, voting systems and ownership ledgers.
 
