@@ -5,7 +5,6 @@ title: >
   My first: LLVM program
 categories: ''
 excerpt_separator: <!--more-->
-
 ---
 
 I recently started reading through Stephen Diehl's ['Implementing a JIT Compiled Language with Haskell and LLVM'](http://www.stephendiehl.com/llvm/). I thought it might be fun to write a quick experience report from my getting started with LLVM and remembering how to build and link stuff manually.
