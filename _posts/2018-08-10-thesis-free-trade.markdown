@@ -3,7 +3,7 @@ layout: post
 title: 'Free Trade: Composable Smart Contracts'
 date: 2018-08-10 12:00:00 +0000
 categories: projects
-
+excerpt_separator: <!--more-->
 ---
 I've finally got around to publishing my masters thesis in computer science from the University of Bristol.
 

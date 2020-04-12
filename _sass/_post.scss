@@ -21,6 +21,16 @@
     }
 }
 
+.with-tombstone:after {
+    content: '\03BB';
+    display: block;
+    color: #eee;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 20px auto;
+    text-align: center;
+}
+
 .post-info {
     color: #555;
     font-family: "Ubuntu Mono", monospace;

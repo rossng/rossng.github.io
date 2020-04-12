@@ -3,20 +3,38 @@ layout: default
 custom_head: <link rel="alternate" type="application/rss+xml" title="Partially Applied posts" href="/feed.xml" />
 ---
 
-{% for post in site.posts %}
-    <article class="post">
-        <h1><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h1>
-        <div class="post-info">
+{% for post in paginator.posts %}
+<article class="post with-tombstone">
+    <h1><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h1>
+    <div class="post-info">
         <time datetime="{{ post.date | date: "%Y-%M-%d" }}">{{ post.date | date: "%Y-%m-%d" }}</time>
         <ul class="post-tags">
             {% for tag in post.tags %}
-                <li><a href="{{ site.baseurl }}/tag/{{ tag }}">{{ tag }}</a></li>
+            <li><a href="{{ site.baseurl }}/tag/{{ tag }}">{{ tag }}</a></li>
             {% endfor %}
         </ul>
-        </div>
-        {{ post.excerpt }}
-    </article>
+    </div>
+    {{ post.excerpt }}
+</article>
 {% endfor %}
 
-<p class="rss-subscribe"><a href="{{ "/feed.xml" | prepend: site.baseurl }}" title="RSS Feed"><i class="fas fa-rss"></i></a></p>
+<div class="pagination">
+    {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path }}" class="previous">
+        Previous
+    </a>
+    {% else %}
+    <span class="previous">Previous</span>
+    {% endif %}
+    <span class="page_number ">
+        Page {{ paginator.page }} of {{ paginator.total_pages }}
+    </span>
+    {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path }}" class="next">Next</a>
+    {% else %}
+    <span class="next ">Next</span>
+    {% endif %}
+</div>
 
+<p class="rss-subscribe"><a href="{{ "/feed.xml" | prepend: site.baseurl }}" title="RSS Feed"><i
+            class="fas fa-rss"></i></a></p>

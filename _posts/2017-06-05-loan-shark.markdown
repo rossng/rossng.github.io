@@ -3,7 +3,7 @@ layout: post
 title: Loan Shark
 date: 2017-06-05 18:17:00 +0000
 categories: projects
-
+excerpt_separator: <!--more-->
 ---
 As part of the computer science course at the University of Bristol, I built a game over the span of a year with a team of six people.
 
