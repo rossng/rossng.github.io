@@ -16,7 +16,7 @@ I'm using Ubuntu under [WSL on Windows 10](https://docs.microsoft.com/en-us/wind
 
 ![VSCode running LLVM inside WSL](/assets/2020-04-12-my-first-llvm-program/vscode-remote.png)
 
-(Side note: I [forked the Kaleidoscope repository](https://github.com/rossng/kaleidoscope/tree/9.0) to get it to compile under Stackage LTS 14.27.)
+(Side note: I [forked the Kaleidoscope repository](https://github.com/rossng/kaleidoscope/tree/9.0) to get it to compile under Stackage LTS 14.27. In any case, you won't need any Haskell code to follow this particular article!)
 
 To get started, let's install LLVM 9 and *accoutrements*.
 
