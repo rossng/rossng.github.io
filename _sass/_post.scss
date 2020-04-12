@@ -19,6 +19,12 @@
     img {
         width: 100%;
     }
+
+    pre {
+        padding: 5px;
+        overflow-x: auto;
+        width: 100%;
+    }
 }
 
 .with-tombstone:after {

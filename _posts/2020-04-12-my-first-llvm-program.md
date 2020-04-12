@@ -1,0 +1,330 @@
+---
+layout: post
+date: 2020-04-11 16:43:00 +0100
+title: >
+  My first: LLVM program
+categories: ''
+excerpt_separator: <!--more-->
+
+---
+
+I recently started reading through Stephen Diehl's ['Implementing a JIT Compiled Language with Haskell and LLVM'](http://www.stephendiehl.com/llvm/). I thought it might be fun to write a quick experience report from my getting started with LLVM and remembering how to build and link stuff manually.
+
+## Setup
+
+I'm using Ubuntu under [WSL on Windows 10](https://docs.microsoft.com/en-us/windows/wsl/install-win10). This works nicely with VS Code's remoting system - I can use the Linux terminal directly inside VS Code on my Windows machine.
+
+![VSCode running LLVM inside WSL](/assets/2020-04-12-my-first-llvm-program/vscode-remote.png)
+
+(Side note: I [forked the Kaleidoscope repository](https://github.com/rossng/kaleidoscope/tree/9.0) to get it to compile under Stackage LTS 14.27.)
+
+To get started, let's install LLVM 9 and *accoutrements*.
+
+```bash
+sudo apt install llvm-9 llvm-9-dev clang-9
+```
+
+## A trivial LLVM program
+
+Let's write a simple program that prints the character `?` to stdout. To do this, we can use the `putchar` function provided by libc. 
+
+`program.ll`
+
+```llvm
+declare i32 @putchar(i32)
+
+define void @main() { 
+    call i32 @putchar(i32 63) 
+    ret void
+}
+```
+
+We've just written our first program in the LLVM IR!
+
+Hopefully it's fairly clear what's happening here. 
+
+* First we declare that we have access to some function `putchar` that takes a 32-bit integer and returns another 32-bit integer.
+* Second we define a new function `main` that calls `putchar` with the argument `63` (the decimal ASCII code for `?`).
+
+# Running the LLVM code
+
+LLVM comes with a handy interpeter `lli` which lets us run our program directly. This is useful for testing that it works as expected without having to compile it.
+
+```bash
+$ lli-9 program.ll
+?
+```
+
+Looks like our program is working! Now let's see how we can compile it down to a proper exectuble.
+
+(Note: on my machine, it also prints an error `could not mmap JIT marker`. It's not clear exactly why.)
+
+# IR formats: text and bitcode
+
+There are in fact two formats of LLVM IR. What we've written above uses the text representation (extension `.ll`). There is another binary representation (extension `.bc`) known as 'bitcode'.
+
+Let's see quickly how we can convert between the two formats. First, we can use [`llvm-as`](https://llvm.org/docs/CommandGuide/llvm-as.html) turn text into bitcode:
+
+```bash
+$ ls
+program.ll
+
+$ llvm-as-9 program.ll
+
+$ ls
+program.bc program.ll
+```
+
+And to go the other way, from bitcode to text, we use [`llvm-dis`](https://llvm.org/docs/CommandGuide/llvm-dis.html):
+
+```bash
+$ ls
+program.bc
+
+$ llvm-dis-9 program.bc
+
+$ ls
+program.bc program.ll
+```
+
+You might have noticed that these programs are called the 'LLVM assembler' and 'LLVM disassembler'. This is a bit of a misnomer, since there is no actual native assembly involved at any point - only different formats of the LLVM IR.
+
+# Converting IR to assembly
+
+Next, we might want to convert our program from (platform-independent) LLVM IR to (native) assembly. For this, we can use [`llc`](https://llvm.org/docs/CommandGuide/llc.html).
+
+By default, `llc` compiles to textual assembly code (`.s`). For example:
+
+```
+$ llc program.ll
+
+$ cat program.s
+        .text
+        .file   "program.ll"
+        .globl  main                    # -- Begin function main
+        .p2align        4, 0x90
+        .type   main,@function
+main:                                   # @main
+        .cfi_startproc
+# %bb.0:
+        pushq   %rax
+        .cfi_def_cfa_offset 16
+        movl    $63, %edi
+        callq   putchar
+        popq    %rax
+        .cfi_def_cfa_offset 8
+        retq
+.Lfunc_end0:
+        .size   main, .Lfunc_end0-main
+        .cfi_endproc
+                                        # -- End function
+
+        .section        ".note.GNU-stack","",@progbits
+```
+
+### Object files
+
+`llc` can also be used to output object files (`.o`). These contain essentially the same content as the textual assembly, but in binary format. In fact, the difference between `.s` and `.o` files is essentially the same as the difference between `.ll` and `.bc` files.
+
+To do this, use `llc --filetype=obj <filename>`:
+
+```
+$ llc-9 --filetype=obj program.ll
+
+$ ls
+program.ll program.o
+```
+
+### Target triples
+
+Of course, there are many different platforms with many different kinds of assembly. `llc` automatically determines which to use. To see which platform is being targeted by default, run `llc --version`.
+
+```bash
+$ llc-9 --version
+LLVM (http://llvm.org/):
+  LLVM version 9.0.0
+  
+  Optimized build.
+  Default target: x86_64-pc-linux-gnu
+  Host CPU: znver1
+
+  Registered Targets:
+    aarch64    - AArch64 (little endian)
+    aarch64_32 - AArch64 (little endian ILP32)
+    aarch64_be - AArch64 (big endian)
+[...]
+```
+
+You can, however, also configure the target assembly by changing parts of the [target triplet](https://wiki.osdev.org/Target_Triplet). You can override the whole thing at once using the `-mtriple` option, or set the architecture using the `-mcpu`/`-march` options. For example, let's compile for 64-bit WebAssembly:
+
+```bash
+$ llc-9 --march wasm64 program.ll
+
+$ cat program.s
+	.text
+	.file	"program.ll"
+	.section	.text.main,"",@
+	.globl	main                    # -- Begin function main
+	.type	main,@function
+main:                                   # @main
+	.functype	main () -> ()
+# %bb.0:
+	i32.const	63
+	i32.call	putchar
+	drop
+                                        # fallthrough-return-void
+	end_function
+.Lfunc_end0:
+	.size	main, .Lfunc_end0-main
+                                        # -- End function
+
+	.functype	putchar (i32) -> (i32)
+```
+
+## Linking the assembly
+
+Though we have now compiled our LLVM IR to machine code in the form of object files (`.o`), these cannot be executed. They must be linked first to produce executables. 
+
+There are a few different ways we can do this.
+
+### Linking with GCC
+
+We can use [GCC](https://gcc.gnu.org/) to do the linking for us. Though GCC is often just seen as a 'C compiler', it's rather more magical than that and can accept all kinds of weird inputs (including, [among other things](https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html): Go (!), D and Ada).
+
+In our case, we can actually give GCC the textual assembly:
+
+```bash
+$ gcc -o program program.s
+```
+
+or the binary object file:
+
+```bash
+$ gcc -o program program.o
+```
+
+In both cases, it will figure out how to do the right thing to produce an executable binary.
+
+```bash
+$ ./program
+?
+```
+
+### Linking with Clang
+
+It's not just GCC that we can use to do our linking. LLVM has a closely associated compiler, [Clang](https://clang.llvm.org/docs/ClangCommandLineReference.html), which provides very similar functionality. Lucky for us (in this case) it works exactly the same way as `gcc`.
+
+```bash
+$ clang-9 -o program program.s
+[or]
+$ clang-9 -o program program.o
+
+$ ./program
+?
+```
+
+Clang can also go one better. Thanks to its close link with the LLVM project, it can also consume LLVM IR directly:
+
+```bash
+$ clang-9 -o program program.ll
+
+$ ./program
+?
+```
+
+### Manually linking
+
+If you want to see what's going on inside GCC during linking, you can pass the `--verbose` option (`-v` for short). Here's what I get. The GCC linker is actually called `ld`, but you'll notice that a program called [`collect2`](https://gcc.gnu.org/onlinedocs/gccint/Collect2.html) is being called instead. It turns out that this is mostly a complicated alias for `ld`.
+
+```bash
+$ gcc --verbose -o program program.s | grep crt
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o /tmp/ccpdizFX.o program.s
+GNU assembler version 2.30 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.30
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccBjbrLv.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o program /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. /tmp/ccpdizFX.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+ross@golem-windows:/mnt/d/Development/Haskell/kaleidoscope/src/chapter1$ gcc --verbose -o program program.s
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o /tmp/ccY5JS3x.o program.s
+GNU assembler version 2.30 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.30
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccFWGnuo.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o program /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. /tmp/ccY5JS3x.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'program' '-mtune=generic' '-march=x86-64'
+```
+
+Once upon a time, linking your object file was perhaps as simple as calling:
+
+```bash
+$ ld -o output /lib/crt0.o program.o -lc
+```
+
+This tells `ld` to how to link your object file (`program.o`):
+
+* `/lib/crt0.o`: against `crt0.o` (the C runtime library)
+* `-lc` against libc (the C standard library)
+
+Unfortunately, a bit of cruft has stacked up since then. Here's the smallest command I managed to get working.
+
+```bash
+$ ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o program /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. program.o -lc /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
+```
+
+Yikes! Probably best to just use `gcc`.
+
+Clang provides a similar `--verbose` option. Here's the output on my system:
+
+```bash
+$ clang-9 -v -o program program.oclang version 9.0.0-2~ubuntu18.04.2 (tags/RELEASE_900/final)
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/8
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/7
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/7.5.0
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/8
+Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/usr/bin/ld" -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o program /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crt1.o /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/crtbegin.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/../../.. -L/usr/lib/llvm-9/bin/../lib -L/lib -L/usr/lib program.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/crtend.o /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0/../../../x86_64-linux-gnu/crtn.o
+```
+
+Amusingly, despite LLVM having its own linker [`lld`](https://lld.llvm.org/), it seems that Clang actually just calls the GNU linker `ld` under the hood. `lld` is more or less undocumented, so I didn't try to get it working.
+
+## Conclusion
+
+So there you go - a quick introduction to writing and compiling a program in LLVM IR. You can also find more detailed docs on the [LLVM website](https://llvm.org/docs/GettingStarted.html).
+
+## Cheatsheet
+
+### File formats
+
+* `.ll` - LLVM IR (textual)
+* `.bc` - LLVM IR (binary)
+* `.s` - native assembly, not linked (textual)
+* `.o` - native assembly, not linked (binary)
+
