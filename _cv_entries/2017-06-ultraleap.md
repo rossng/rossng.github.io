@@ -1,6 +1,6 @@
 ---
 position: Software Engineer Intern
-organisation: Ultrahaptics
+organisation: Ultraleap
 start_date: 2017-06
 end_date: 2017-09
 tags:

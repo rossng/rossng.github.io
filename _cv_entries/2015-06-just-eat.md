@@ -17,4 +17,4 @@ tags:
   - REST
 ---
 
-I worked as a C#/.NET developer for International Engineering. I spent a few weeks researching possible integration of Amazon Machine Learning into the JUST EAT platform, after which I joined in with day-to-day sprint work. My colleague and I won one category of the JUST EAT Hackathon after writing a new API endpoint and building a Pebble app (using PebbleJS) to display stats from it.
+I worked as a C#/.NET developer for International Engineering. I spent a few weeks researching possible integration of Amazon Machine Learning into the Just Eat platform, after which I joined in with day-to-day sprint work. My colleague and I won part of the Just Eat Hackathon with a Pebble smartwatch app.
