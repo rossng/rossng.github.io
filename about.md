@@ -4,25 +4,19 @@ title: About
 permalink: /about/
 ---
 
-Hi, I'm Ross.
+Hi, I'm Ross. I am a software engineer ([see my CV](/cv)) currently based in Amsterdam, the Netherlands.
 
-I'm a software engineer based in (occasionally) sunny Copenhagen, Denmark.
-
-[<i class="fab fa-linkedin-in"></i>](https://www.linkedin.com/in/rngardiner)
-
-[<i class="fas fa-envelope"></i>](mailto:contact@public.rossng.eu)
-
-[<i class="fab fa-github"></i>](https://github.com/rossng)
-
+[<i class="fab fa-linkedin-in"></i>](https://www.linkedin.com/in/rngardiner) &nbsp;
+[<i class="fas fa-envelope"></i>](mailto:contact@public.rossng.eu) &nbsp;
+[<i class="fab fa-github"></i>](https://github.com/rossng) &nbsp;
 [<i class="fab fa-keybase"></i>](https://keybase.io/rossng)
-
 
 ## Colophon
 
 This site was built with:
 
-* [Jekyll](http://jekyllrb.com/)
-* [GitHub Pages](https://pages.github.com/)
+- [Jekyll](http://jekyllrb.com/)
+- [GitHub Pages](https://pages.github.com/)
 
 ### Licenses
 
