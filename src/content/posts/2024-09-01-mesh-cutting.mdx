@@ -1,0 +1,117 @@
+---
+date: 2024-09-01
+title: >
+  Story of a bug: mesh cutting
+---
+
+import { Image } from "astro:assets";
+import example1 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-example-01.svg";
+import working1 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-01.svg";
+import working2 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-02.svg";
+import working3 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-03.svg";
+import working4 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-04.svg";
+import working5 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-05.svg";
+import working6 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-working-06.svg";
+import failing1 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-failing-01.svg";
+import failing2 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-failing-02.svg";
+import failing3 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-failing-03.svg";
+import failing4 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-failing-04.svg";
+import failing5 from "@assets/posts/2024-09-01-mesh-cutting/mesh-cutting-failing-05.svg";
+
+Note: I came across this blog post in my drafts folder from years back. It's one of the fun things I did while working at 3Shape.
+
+This is a bug I found in an algorithm for cutting a [triangle mesh](https://en.wikipedia.org/wiki/Triangle_mesh) by a [polyline](https://en.wikipedia.org/wiki/Polygonal_chain). Let's clarify each of those terms. A triangle mesh is a surface defined by a series of triangles connected at their edges or vertices. A polyline is essentially an ordered sequence of points in 3D space.
+
+<Image src={example1} alt="The mesh cutting algorithm" />
+
+The basic idea of the algorithm was that each point along the polyline could be mapped to a vertex on the mesh. This could then be turned into a contiguous path of edges along the mesh, completely bisecting it. For a closed mesh, this would have to be a circular path. Then it would be possible to find all facets on one side of the path by simply flood-filling neighbouring facets.
+
+## A working case
+
+Here's an example of the algorithm in its working state.
+
+<Image src={working1} alt="An example tri mesh and a polyline to cut it" />
+
+We start with the mesh and the polyline (red) that we want to use for cutting. We need to convert this into a path that actually sits on the mesh, so let's map each polyline vertex to the nearest mesh vertex.
+
+<Image src={working2} alt="Mapping the polyline to the nearest vertices" />
+
+This image shows those nearest vertices as red dots. One thing you might observe is that neighbouring _polyline_ vertices do not necessarily result in neighbouring _mesh_ vertices. In order to generate a contiguous path on the mesh we will have to find a path between **a** and **b**, for example.
+
+It's pretty easy to find a reasonable path (green) by using (e.g.) Dijkstra's algorithm.
+
+<Image src={working3} alt="Filling in the gaps of the path on the mesh" />
+
+Now we have a path that sits exactly on the mesh and subdivides it. The next step is to pick a single facet, perhaps on a specific side of the path.
+
+<Image
+  src={working4}
+  alt="Choosing a facet on one side of the subdivision path"
+/>
+
+Finally, we can flood fill from this facet. Our flooding condition is that we must not cross the subdivision path (green).
+
+<Image
+  src={working5}
+  alt="Result of flood-filling the facets on one side of the path"
+/>
+
+Now that we've found the facets on one side of the path, we can e.g. keep them and discard the rest.
+
+<Image
+  src={working6}
+  alt="Result of flood-filling the facets on one side of the path"
+/>
+
+## What went wrong?
+
+In some cases, the algorithm wouldn't cut the mesh as expected. The flood fill would somehow flood every facet on the mesh, causing the entire mesh to be retained during the cutting process.
+
+Why did this happen? Well, let's consider a slightly different cutting polyline.
+
+<Image
+  src={failing1}
+  alt="The same mesh with a slightly different cutting polyline"
+/>
+
+In this case, we end up selecting slightly different initial vertices on the mesh.
+
+<Image
+  src={failing2}
+  alt="The closest mesh vertices to the new polyline vertices"
+/>
+
+Then something interesting happens. When we find the shortest path between **a** and **b** and then between **b** and **c**, they turn out to both go through the same point. We have a (short!) loop in our cutting path.
+
+<Image
+  src={failing3}
+  alt="The shortest path connecting the vertices - now with a loop"
+/>
+
+All seems fine for now though. Let's start the flood filling.
+
+<Image
+  src={failing4}
+  alt="Beginning the flood filling with the new subdivision path"
+/>
+
+<Image src={failing5} alt="The incorrect result of cutting" />
+
+Uh oh! Something has gone badly wrong.
+
+It turns out that the code for deciding whether to flood fill a facet looked something like this.
+
+```
+procedure can_flood_fill(facet, neighbour_facet, cutting_path) returns bool
+  (v1, v2) ← shared_vertices(facet, neighbour_facet)
+
+  i1 ← index_of(cutting_path, v1)
+  i2 ← index_of(cutting_path, v2)
+
+  // Can only flood fill if the vertices are not neighbours along the cutting path.
+  return abs(i1 - i2) ≠ 1
+```
+
+Can you see the problem?
+
+The answer: this code implicitly assumes that the cutting path contains no loops. If the same vertex appears more than once, it will only compare to the index where that vertex _first_ appeared in the list. So it's possible to find cases where the condition reports that the vertices are not neighbours in the path, but they actually are.
