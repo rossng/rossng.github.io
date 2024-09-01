@@ -1,17 +1,13 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import markdoc from "@astrojs/markdoc";
-import keystatic from "@keystatic/astro";
-
 import tailwind from "@astrojs/tailwind";
-
 import mdx from "@astrojs/mdx";
-
 import icon from "astro-icon";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react(), markdoc(), keystatic(), tailwind(), mdx(), icon()],
+  integrations: [react(), markdoc(), tailwind(), mdx(), icon()],
   output: "static",
   site: "https://rossng.eu",
   redirects: {
