@@ -12,7 +12,7 @@ import icon from "astro-icon";
 // https://astro.build/config
 export default defineConfig({
   integrations: [react(), markdoc(), keystatic(), tailwind(), mdx(), icon()],
-  output: "hybrid",
+  output: "static",
   site: "https://rossng.eu",
   redirects: {
     "/2020/04/11/my-first-llvm-program.html":
