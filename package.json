@@ -26,7 +26,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "sync": "astro sync"
   },
   "devDependencies": {
     "prettier": "^3.3.3",
