@@ -188,6 +188,13 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".mdx"] };
+"2024-09-10-too-many-open-files.mdx": {
+	id: "2024-09-10-too-many-open-files.mdx";
+  slug: "2024-09-10-too-many-open-files";
+  body: string;
+  collection: "posts";
+  data: InferEntrySchema<"posts">
+} & { render(): Render[".mdx"] };
 };
 
 	};

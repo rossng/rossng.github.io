@@ -1,0 +1,33 @@
+---
+date: 2024-09-10
+title: >
+  Too many open files (os error 24)
+---
+
+Sometimes you might encounter an error message like this:
+
+```
+Too many open files (os error 24)
+```
+
+Too many open files? That seems clear enough. A bit of googling&mdash;or prodding of your preferred LLM&mdash;will tell you that
+this is caused by the nofiles ulimit. Easy to solve. Except you then increase that limit to something huge like a million, and the error doesn't go away.
+
+There is another possibility: in your application you are watching files for changes, and you are hitting a different
+limit. File watching on Linux (generally) uses inotify internally, and that has its own limits (which are helpfully configured in a completely different
+place). Those limits are `max_user_instances`, `max_user_watches` and `max_queued_events` ([see inotify(7) man for more details](https://man7.org/linux/man-pages/man7/inotify.7.html)).
+
+You can manually set these limits using `sysctl`. For example:
+
+```sh
+sysctl -w fs.inotify.max_user_instances=8192
+```
+
+I ran into this because `max_user_instances` [defaults to 128](https://github.com/NixOS/nixpkgs/issues/36214)(!) on NixOS.
+As an ivory tower-enjoying NixOS user, you will of course instead want to set your limits like this:
+
+```nix
+boot.kernel.sysctl = {
+    "fs.inotify.max_user_instances" = "8192";
+};
+```
