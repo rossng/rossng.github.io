@@ -6,7 +6,7 @@ import { Icon } from "astro-icon/components";
 const posts = await getCollection("posts");
 ---
 
-<Layout title="Ross Gardiner - Software Engineer">
+<Layout title="Ross Gardiner ⌁ Software Engineer">
   <div class="prose">
     <p>
       I am a software engineer living in Amsterdam, the Netherlands. Right now,
@@ -49,7 +49,10 @@ const posts = await getCollection("posts");
     <ul>
       {
         posts
-          .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+          .sort(
+            (a, b) =>
+              new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+          )
           .map((post) => (
             <li>
               <a href={`/posts/${post.slug}`}>{post.data.title}</a> -{" "}
