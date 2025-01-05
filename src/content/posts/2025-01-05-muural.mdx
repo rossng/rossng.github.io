@@ -1,0 +1,25 @@
+---
+date: 2025-01-05
+title: >
+  Generating brick walls
+---
+
+import { Image } from "astro:assets";
+import screenshot1 from "@assets/posts/2025-01-05-muural/screenshot-1.png";
+import screenshot2 from "@assets/posts/2025-01-05-muural/screenshot-2.png";
+
+I've spent a lot of the last couple of years thinking about brick walls, thanks to having been working at [Monumental](https://www.monumental.co/) that whole time.
+
+I thought it would be fun to make a little toy that lets you build your own (virtual) brick wall at home.
+
+<Image src={screenshot1} alt="Screenshot of a Flemish bond brick wall" />
+
+Bricks can be laid in many different patterns, known as ['bonds'](https://en.wikipedia.org/wiki/Brickwork#Load-bearing_bonds). At first it looks like all these bonds can be expressed in a fairly simple way, but it's surprisingly fiddly to make things line up nicely and fill left over space in a way that complies with the bond pattern.
+
+Anyway, I've ignored all of that and just tried to express bonds in the [easiest way possible](https://github.com/rossng/muural/blob/708799bc1fba81ab2e3dfc07f685d448e9f67729/src/data/Bonds.ts).
+
+[Try it out!](https://rossng.eu/muural/)
+
+<Image src={screenshot2} alt="Screenshot of a Flemish diagonal bond wall" />
+
+Want to do this full time, but also it's robots and in 3D? [Have a look at our open positions](https://www.monumental.co/jobs).
