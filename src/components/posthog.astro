@@ -1,0 +1,12 @@
+---
+
+---
+
+<script>
+  import { PostHog } from "posthog-js-lite";
+  const ph = new PostHog("phc_emzQqJrAZ2mDoow9yoTHZitdWTBArxwGaTQTPtmd7vv", {
+    host: "https://eu.i.posthog.com",
+    persistence: "memory",
+  });
+  ph.optOut();
+</script>
