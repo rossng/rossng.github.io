@@ -3,20 +3,20 @@
   "version": "0.0.44",
   "license": "MIT",
   "dependencies": {
-    "@astrojs/markdoc": "^0.11.4",
-    "@astrojs/mdx": "^3.1.5",
-    "@astrojs/react": "^3.6.2",
-    "@astrojs/rss": "^4.0.7",
-    "@astrojs/tailwind": "^5.1.0",
-    "@iconify-json/mdi": "^1.2.0",
+    "@astrojs/markdoc": "^0.12.4",
+    "@astrojs/mdx": "^4.0.3",
+    "@astrojs/react": "^4.1.2",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/tailwind": "^5.1.4",
+    "@iconify-json/mdi": "^1.2.2",
     "@tailwindcss/typography": "^0.5.15",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "astro": "^4.15.1",
-    "astro-icon": "^1.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.10"
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "astro": "^5.1.2",
+    "astro-icon": "^1.1.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.17"
   },
   "scripts": {
     "dev": "astro dev",
@@ -28,7 +28,7 @@
     "sync": "astro sync"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1"
   }
 }
