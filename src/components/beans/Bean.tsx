@@ -21,7 +21,7 @@ export interface BeanStatsCardProps {
 
 const BeanStatsCard = ({ bean }: BeanStatsCardProps) => {
   return (
-    <Card className="w-96">
+    <Card className="w-80">
       <CardHeader>
         <div className="flex justify-center items-center mb-4">
           <div className="relative w-24 h-24">
@@ -69,8 +69,10 @@ const BeanStatsCard = ({ bean }: BeanStatsCardProps) => {
           </div>
         </div>
         <CardTitle className="text-center">
-          {bean.commonNames[0]}{" "}
-          <span className="text-gray-600">({bean.primaryScientificName})</span>
+          <div>{bean.commonNames[0]}</div>
+          <div className="text-gray-600 font-normal mt-2 italic">
+            {bean.primaryScientificName}
+          </div>
         </CardTitle>
         <CardDescription>
           <div className="flex flex-row">
@@ -84,11 +86,41 @@ const BeanStatsCard = ({ bean }: BeanStatsCardProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Card Content</p>
+        <table className="m-0">
+          <tbody>
+            <tr>
+              <td className="font-bold w-min">Common forms</td>
+              <td className="text-gray-500">
+                {bean.processingMethods.map((method) => (
+                  <div>{method}</div>
+                ))}
+              </td>
+            </tr>
+            <tr>
+              <td className="font-bold w-min">Traditional recipes</td>
+              <td className="text-gray-500">
+                {bean.recipes.map((recipe) => (
+                  <div>
+                    {recipe.name}{" "}
+                    <span className="text-gray-400 text-xs">
+                      ({recipe.origin}, {recipe.processingMethod})
+                    </span>
+                  </div>
+                ))}
+              </td>
+            </tr>
+            <tr>
+              <td className="font-bold w-min">Incorrect names</td>
+              <td className="text-gray-500">
+                {bean.commonIncorrectNames.map((name) => (
+                  <div>{name}</div>
+                ))}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </CardContent>
-      <CardFooter>
-        <p>Card Footer</p>
-      </CardFooter>
+      <CardFooter></CardFooter>
     </Card>
   );
 };

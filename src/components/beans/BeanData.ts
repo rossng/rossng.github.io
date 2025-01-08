@@ -4,6 +4,8 @@ export interface Bean {
   commonNames: string[];
   commonIncorrectNames: string[];
   appearances: BeanAppearance[];
+  processingMethods: string[];
+  recipes: Recipe[];
 }
 
 export interface BeanAppearance {
@@ -11,6 +13,12 @@ export interface BeanAppearance {
   state: "fresh" | "dry";
   seedCoatColour: string | false;
   cotyledonColour: string | false;
+}
+
+export interface Recipe {
+  name: string;
+  origin: string;
+  processingMethod: string;
 }
 
 export const mung: Bean = {
@@ -30,6 +38,24 @@ export const mung: Bean = {
       state: "dry",
       seedCoatColour: "green",
       cotyledonColour: "yellow",
+    },
+  ],
+  processingMethods: ["whole", "unhulled split", "hulled split"],
+  recipes: [
+    {
+      name: "Moong dal",
+      origin: "India",
+      processingMethod: "hulled split",
+    },
+    {
+      name: "Mango sticky rice",
+      origin: "Thailand",
+      processingMethod: "hulled split",
+    },
+    {
+      name: "Moong khichdi",
+      origin: "India",
+      processingMethod: "whole, hulled split",
     },
   ],
 };
