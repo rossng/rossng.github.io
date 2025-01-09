@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="description" content="The personal site of Ross Gardiner"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Ross Gardiner's blog" href="https://rossng.eu/feed.xml"><meta name="generator" content="Astro v5.1.2"><title>Ross Gardiner ⌁ Story of a bug: mesh cutting
+</title><link rel="stylesheet" href="/_astro/index.AdgwLHRZ.css">
+<style>[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body class="bg-gradient-to-r from-[#ff7e5f] to-[#feb47b] w-full min-h-screen bg-no-repeat bg-cover"> <header class="bg-white"> <div class="max-w-7xl mx-auto flex justify-between items-center p-4"> <div class="flex items-center"> <a href="/"> <img src="/favicon.svg" alt="Favicon" class="w-6 h-6 mr-2" title="Mysterious U+237C"> </a> <h1 class="text-xl font-bold text-gray-900"> <a href="/">Ross Gardiner</a> </h1> </div> <nav class="flex items-center space-x-4 text-gray-700"> <a href="/posts">Posts</a> </nav> </div> </header> <div class="prose max-w-3xl mx-auto p-4 m-4 bg-white text-gray-900 shadow-md">   <div class="mb-2"> <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100"> Story of a bug: mesh cutting
+ </h1> <p class="text-sm text-gray-500 dark:text-gray-400"> 2024-09-01 </p> </div> <p>Note: I came across this blog post in my drafts folder from years back. It’s one of the fun things I did while working at 3Shape.</p>
+<p>This is a bug I found in an algorithm for cutting a <a href="https://en.wikipedia.org/wiki/Triangle_mesh">triangle mesh</a> by a <a href="https://en.wikipedia.org/wiki/Polygonal_chain">polyline</a>. Let’s clarify each of those terms. A triangle mesh is a surface defined by a series of triangles connected at their edges or vertices. A polyline is essentially an ordered sequence of points in 3D space.</p>
+<img src="/_astro/mesh-cutting-example-01.w3gRrOx__ZIDHec.svg" alt="The mesh cutting algorithm" width="611" height="490" loading="lazy" decoding="async">
+<p>The basic idea of the algorithm was that each point along the polyline could be mapped to a vertex on the mesh. This could then be turned into a contiguous path of edges along the mesh, completely bisecting it. For a closed mesh, this would have to be a circular path. Then it would be possible to find all facets on one side of the path by simply flood-filling neighbouring facets.</p>
+<h2 id="a-working-case">A working case</h2>
+<p>Here’s an example of the algorithm in its working state.</p>
+<img src="/_astro/mesh-cutting-working-01.VJ1k5D9C_Sc3s0.svg" alt="An example tri mesh and a polyline to cut it" width="268" height="386" loading="lazy" decoding="async">
+<p>We start with the mesh and the polyline (red) that we want to use for cutting. We need to convert this into a path that actually sits on the mesh, so let’s map each polyline vertex to the nearest mesh vertex.</p>
+<img src="/_astro/mesh-cutting-working-02.C455YEyV_Z25xA0x.svg" alt="Mapping the polyline to the nearest vertices" width="268" height="386" loading="lazy" decoding="async">
+<p>This image shows those nearest vertices as red dots. One thing you might observe is that neighbouring <em>polyline</em> vertices do not necessarily result in neighbouring <em>mesh</em> vertices. In order to generate a contiguous path on the mesh we will have to find a path between <strong>a</strong> and <strong>b</strong>, for example.</p>
+<p>It’s pretty easy to find a reasonable path (green) by using (e.g.) Dijkstra’s algorithm.</p>
+<img src="/_astro/mesh-cutting-working-03.B6psS2iZ_Z1FRmI.svg" alt="Filling in the gaps of the path on the mesh" width="268" height="386" loading="lazy" decoding="async">
+<p>Now we have a path that sits exactly on the mesh and subdivides it. The next step is to pick a single facet, perhaps on a specific side of the path.</p>
+<img src="/_astro/mesh-cutting-working-04.eS5SDOZy_ZaaqcN.svg" alt="Choosing a facet on one side of the subdivision path" width="268" height="386" loading="lazy" decoding="async">
+<p>Finally, we can flood fill from this facet. Our flooding condition is that we must not cross the subdivision path (green).</p>
+<img src="/_astro/mesh-cutting-working-05.B_8Hpefz_Z2sNsla.svg" alt="Result of flood-filling the facets on one side of the path" width="268" height="386" loading="lazy" decoding="async">
+<p>Now that we’ve found the facets on one side of the path, we can e.g. keep them and discard the rest.</p>
+<img src="/_astro/mesh-cutting-working-06.BnvoGV-z_Z18WfSu.svg" alt="Result of flood-filling the facets on one side of the path" width="274" height="490" loading="lazy" decoding="async">
+<h2 id="what-went-wrong">What went wrong?</h2>
+<p>In some cases, the algorithm wouldn’t cut the mesh as expected. The flood fill would somehow flood every facet on the mesh, causing the entire mesh to be retained during the cutting process.</p>
+<p>Why did this happen? Well, let’s consider a slightly different cutting polyline.</p>
+<img src="/_astro/mesh-cutting-failing-01.c44qHlE-_ZQjhNQ.svg" alt="The same mesh with a slightly different cutting polyline" width="268" height="386" loading="lazy" decoding="async">
+<p>In this case, we end up selecting slightly different initial vertices on the mesh.</p>
+<img src="/_astro/mesh-cutting-failing-02.D6x6mKnR_Z1XxgUb.svg" alt="The closest mesh vertices to the new polyline vertices" width="273" height="386" loading="lazy" decoding="async">
+<p>Then something interesting happens. When we find the shortest path between <strong>a</strong> and <strong>b</strong> and then between <strong>b</strong> and <strong>c</strong>, they turn out to both go through the same point. We have a (short!) loop in our cutting path.</p>
+<img src="/_astro/mesh-cutting-failing-03.BD0yQiiU_ogyf7.svg" alt="The shortest path connecting the vertices - now with a loop" width="273" height="386" loading="lazy" decoding="async">
+<p>All seems fine for now though. Let’s start the flood filling.</p>
+<img src="/_astro/mesh-cutting-failing-04.CPZVH0K6_1R0I0G.svg" alt="Beginning the flood filling with the new subdivision path" width="273" height="386" loading="lazy" decoding="async">
+<img src="/_astro/mesh-cutting-failing-05.DBuWtUui_27O2iF.svg" alt="The incorrect result of cutting" width="273" height="386" loading="lazy" decoding="async">
+<p>Uh oh! Something has gone badly wrong.</p>
+<p>It turns out that the code for deciding whether to flood fill a facet looked something like this.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>procedure can_flood_fill(facet, neighbour_facet, cutting_path) returns bool</span></span>
+<span class="line"><span>  (v1, v2) ← shared_vertices(facet, neighbour_facet)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  i1 ← index_of(cutting_path, v1)</span></span>
+<span class="line"><span>  i2 ← index_of(cutting_path, v2)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // Can only flood fill if the vertices are not neighbours along the cutting path.</span></span>
+<span class="line"><span>  return abs(i1 - i2) ≠ 1</span></span></code></pre>
+<p>Can you see the problem?</p>
+<p>The answer: this code implicitly assumes that the cutting path contains no loops. If the same vertex appears more than once, it will only compare to the index where that vertex <em>first</em> appeared in the list. So it’s possible to find cases where the condition reports that the vertices are not neighbours in the path, but they actually are.</p>   </div> <footer class="text-center text-xs mt-4 mb-4"> <a href="https://github.com/rossng/rossng.github.io/blob/main/README.md" class="text-gray-500">&copy;</a> </footer> </body></html>
