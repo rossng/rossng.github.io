@@ -16,6 +16,7 @@ export async function getStaticPaths() {
   const posts = await getCollection("posts");
   return posts.map((post) => ({ params: { slug: post.slug } }));
 }
+import { Comments } from "@components/Comments";
 ---
 
 <Layout title={`Ross Gardiner ⌁ ${post.data.title}`}>
@@ -24,4 +25,11 @@ export async function getStaticPaths() {
     date={post.data.date}
   />
   <Content />
+  {
+    !post.data.disableComments && !post.data.draft && (
+      <div class="mt-12">
+        <Comments client:load />
+      </div>
+    )
+  }
 </Layout>
