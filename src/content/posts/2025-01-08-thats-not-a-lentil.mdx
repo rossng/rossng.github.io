@@ -1,0 +1,277 @@
+---
+date: 2025-01-08
+title: >
+  That's not a lentil
+draft: true
+---
+
+import { Image } from "astro:assets";
+import { mung } from "@components/beans/BeanData";
+import BeanDeck from "@components/beans/BeanDeck";
+import { LibraryBig } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@assets/components/ui/alert";
+
+import urid1 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-beans.png";
+import urid2 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-dal-chilka.png";
+import urid3 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-dal-gota.png";
+import urid4 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-dal.png";
+import lentils from "@assets/posts/2025-01-08-thats-not-a-lentil/type-of-lentil.jpg";
+import diagram from "@assets/posts/2025-01-08-thats-not-a-lentil/bean-diagram.png";
+import wholeUnhulled from "@assets/posts/2025-01-08-thats-not-a-lentil/whole-unhulled.jpg";
+import wholeHulled from "@assets/posts/2025-01-08-thats-not-a-lentil/whole-hulled.jpg";
+import splitUnhulled from "@assets/posts/2025-01-08-thats-not-a-lentil/split-unhulled.jpg";
+import splitHulled from "@assets/posts/2025-01-08-thats-not-a-lentil/split-hulled.jpg";
+import puyLentils from "@assets/posts/2025-01-08-thats-not-a-lentil/puy-lentils.jpg";
+
+In recent years I have often found myself making recipes that call for some type of small, dry coloured bean. For example:
+
+- the black dal from Dishoom (highly recommended!)
+- snert (Dutch pea and smoked sausage soup)
+- most recently, mango sticky rice with toasted mung beans
+
+When I'm making a traditional recipe from another country I like to use the _actually correct_ ingredients until I have enough experience to make my own decisions. In many cases, that means hunting down the right kind of bean (e.g. urad dal) at a specialist Asian supermarket. And inevitably you will be faced with a decision like this:
+
+<div className="flex flex-row flex-wrap w-full items-center">
+  <Image
+    src={urid1}
+    className="flex-shrink min-w-4 basis-1/4 h-auto p-2"
+    alt="A bag of whole urad beans made by TRS"
+  />
+  <Image
+    src={urid2}
+    className="flex-shrink min-w-0 basis-1/4 h-auto p-2"
+    alt="A bag of split, unhulled urad beans made by TRS"
+  />
+  <Image
+    src={urid3}
+    className="flex-shrink min-w-0 basis-1/4 h-auto p-2"
+    alt="A bag of unsplit, hulled urad beans made by TRS"
+  />
+  <Image
+    src={urid4}
+    className="flex-shrink min-w-0 basis-1/4 h-auto p-2"
+    alt="A bag of split, hulled urad beans made by TRS"
+  />
+</div>
+
+In this case, since I was making a 'black' dal and the Dishoom book specifies 'whole black urad dal', it wasn't too hard to figure out that I needed the one on the left. But as I had this experience time and again, I was left with some questions. Questions such as:
+
+- Why are the same beans sometimes different colours?
+- Why do [some recipes](https://www.jumbo.com/recepten/moong-dal-1375140-7) seem to treat these beans as interchangeable?
+- Are these tiny beans all related to each other in some way?
+- Why do some people call all of these beans lentils? Is that correct?
+
+It was at this point that I decided to do some reading and found - well, mostly SEO spam. So what follows is my personal documentation of these various beans and how they relate to one another. I've excluded things that nobody is getting mixed up, like lima beans and kidney beans.
+
+## Legumes, pulses, dal
+
+All beans come from plants in the legume family. Legumes can basically be divided into three categories:
+
+- Grown for their dry seeds (e.g. lentil)
+- Grown for oil products (e.g. soy)
+- Grown for fresh vegetables (e.g. pea)
+
+The beans we are investigating all fall into the first category: dry seeds. These are known as **pulses**.
+
+<Alert className="bg-accent text-accent-foreground drop-shadow-md">
+  <LibraryBig className="h-4 w-4" />
+  <AlertTitle>Taxonomy hell</AlertTitle>
+  <AlertDescription>
+    <p>Seems simple enough. So what's a peanut?</p>
+    <p>
+      It's the seed of a legume. And (I'd argue) we primarily grow said legume
+      in order to produce these dry peanut seeds. So the peanut is _clearly_ a
+      pulse, right?
+    </p>
+    <p>
+      Nope! For classification purposes the peanut is primarily an oil crop,
+      which means the seeds are _not_ pulses.
+    </p>
+    <p>
+      So in practice the definition of a pulse is: it is in the list of [things
+      defined as pulses by the
+      UNFAO](https://openknowledge.fao.org/server/api/core/bitstreams/133abe54-26f6-48a5-afeb-e512bcc37ebb/content#page=27).
+      (I'm sure there's a newer version of this definition than 1994, but my
+      brain nearly melted [trying](https://www.fao.org/faostat/en/#definitions)
+      [to](https://www.fao.org/fao-who-codexalimentarius/committees/committee/related-standards/en/?committee=CCCPL)
+      [navigate](https://www.fao.org/fao-who-codexalimentarius/codex-texts/dbs/pestres/commodities-detail/en/?c_id=295)
+      the UNFAO/Codex Alimentarius website).
+    </p>
+  </AlertDescription>
+</Alert>
+
+Let's narrow things down to the specific set of pulses that we're interested in here. Things that look like this (in an ['I know it when I see it'](https://en.wikipedia.org/wiki/I_know_it_when_I_see_it) kind of way).
+
+<figure>
+  <Image src={lentils} alt="Three different types of lentils (probably)" />
+  <figcaption className="text-xs text-center">
+    Image by [Justin
+    Cormack](https://commons.wikimedia.org/wiki/File:3_types_of_lentil.jpg)
+    (CC-BY-SA 2.0)
+  </figcaption>
+</figure>
+
+I don't believe that this subset of pulses has a specific name. In India they seem to be collectively referred to as **dal**, but that also implies that the bean has been split and its outer skin removed (we'll get to that in a moment).
+
+I have noticed that many people refer to any bean of this shape and size as a 'lentil'. That is, at least from a pedantic standpoint, **wrong**. Lentils are specifically the seeds of the [Vicia lens](https://en.wikipedia.org/wiki/Lentil) plant.
+
+There are several other species that produce similar beans with different names. A non-exhaustive list:
+
+- Vicia lens (**lentil**)
+- Vigna radiata (**mung bean**/green gram)
+- Cicer arietinum (**chickpea**)
+- Vigna mungo (**urad bean**/black gram)
+- Pisum sativum (**pea**)
+
+## Looking inside the pulse
+
+Pulses generally look like the bean seed on the left of this diagram:
+
+<figure>
+  <Image
+    src={diagram}
+    alt="A digram of a dicot bean seed, showing the seed coat and cotyledon."
+  />
+  <figcaption className="text-xs text-center">
+    Image from [UC Berkeley Botanical
+    Garden](https://botanicalgarden.berkeley.edu/glad-you-asked/seeds-p1)
+  </figcaption>
+</figure>
+
+There are three key features we're interested in:
+
+- The seed is dicot (it has two parts)
+- There is an inner cotyledon
+- There is an outer seed coat
+
+Pulses are often processed into a different form than they started. The properties above lead naturally to this matrix:
+
+<table>
+  <thead>
+    <tr className="bg-accent accent-foreground">
+      <th colspan="2"></th>
+      <th colspan="2">Seed coat</th>
+    </tr>
+    <tr className="bg-accent accent-foreground">
+      <th colspan="2"></th>
+      <th className="w-5/12">Intact</th>
+      <th className="w-5/12">Removed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td
+        rowspan="2"
+        className="font-bold w-1/12 align-middle bg-accent accent-foreground"
+      >
+        <span
+          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          className="ml-2"
+        >
+          Shape
+        </span>
+      </td>
+      <td className="font-bold text-right bg-accent accent-foreground">
+        Intact
+      </td>
+      <td>
+        <p>whole, unhulled</p>
+        <figure>
+          <Image
+            src={wholeUnhulled}
+            alt="Some whole, unhulled mung beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Mung beans, image by [Ivar
+            Leidus](https://commons.wikimedia.org/wiki/File:Mung_beans_(Vigna_radiata).jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td>
+        <p>whole, hulled</p>
+        <figure>
+          <Image
+            src={wholeHulled}
+            alt="Some whole, hulled mung beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Mung beans, image by [Thamizhpparithi
+            Maari](https://commons.wikimedia.org/wiki/File:Vigna_mungo_without_skin.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td className="font-bold text-right bg-accent accent-foreground">
+        Split
+      </td>
+      <td>
+        <p>split, unhulled</p>
+        <figure>
+          <Image
+            src={splitUnhulled}
+            alt="Some split, unhulled urad beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Urad beans, image by [Thamizhpparithi
+            Maari](https://commons.wikimedia.org/wiki/File:Black_gram_with_skin.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td>
+        <p>split, hulled</p>
+        <figure>
+          <Image
+            src={splitHulled}
+            alt="Some split, hulled red lentils"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Lentils, image by [Shijan
+            Kaakkara](https://commons.wikimedia.org/wiki/File:Lentil_-_%E0%B4%AA%E0%B4%B0%E0%B4%BF%E0%B4%AA%E0%B5%8D%E0%B4%AA%E0%B5%8D_02.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+Notice, in particular, that the seed coat and cotyledon are often _different colours_. This is why, when you are looking for urad dal to make a 'black dal', you might find yourself looking at a shelf full of white beans. You are looking at beans that have had their seed coats removed to reveal the white cotyledon. It's then not much of a step to infer that the seed coat must be black and so you are probably looking for the whole bean instead.
+
+Of course, this simplicity breaks down somewhere - and it's with lentils. Lentils come in a huge range of varieties, and they have many colours. For example: grey, tan, brown, green and red. There are even some fancy French ones with mottled exteriors.
+
+<figure>
+  <Image
+    src={puyLentils}
+    alt="A wooden bowl of Puy lentils"
+    className="w-1/2 m-auto"
+  />
+  <figcaption className="text-xs text-center">
+    Mottled Puy lentils, image by [Jessica
+    Spengler](https://commons.wikimedia.org/wiki/File:Puy_lentils_wooden_bowl.jpg)
+    (CC-BY 2.0)
+  </figcaption>
+</figure>
+
+## A handy reference
+
+At this point, we've answered most of the questions I had at the start of this post.
+
+These beans are all an unnamed subset of pulses. If a recipe tells you to put yellow split peas in something called a 'moong dal', you should probably look for a different one. Beans with the same name can have different colours due to variety and different processing of the seed coat. And yes, **not everything is a lentil**.
+
+To round things off, I've condensed some useful identification information into this set of handy bean cards.
+
+<BeanDeck client:load />

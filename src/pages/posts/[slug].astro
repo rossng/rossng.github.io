@@ -1,4 +1,5 @@
 ---
+import "@styles/globals.css";
 import { getCollection, getEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import PostMeta from "../../components/PostMeta.astro";
@@ -17,7 +18,10 @@ export async function getStaticPaths() {
 }
 ---
 
-<Layout title=`Ross Gardiner ⌁ ${post.data.title}`>
-  <PostMeta title={post.data.title} date={post.data.date} />
+<Layout title={`Ross Gardiner ⌁ ${post.data.title}`}>
+  <PostMeta
+    title={`${post.data.draft ? "DRAFT: " : ""} ${post.data.title}`}
+    date={post.data.date}
+  />
   <Content />
 </Layout>

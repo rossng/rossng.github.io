@@ -7,7 +7,15 @@ import icon from "astro-icon";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react(), markdoc(), tailwind(), mdx(), icon()],
+  integrations: [
+    react(),
+    markdoc(),
+    tailwind({
+      applyBaseStyles: false,
+    }),
+    mdx(),
+    icon(),
+  ],
   output: "static",
   site: "https://rossng.eu",
   redirects: {
