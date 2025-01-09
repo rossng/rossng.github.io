@@ -20,6 +20,11 @@ import urid3 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-dal-gota
 import urid4 from "@assets/posts/2025-01-08-thats-not-a-lentil/trs-urid-dal.png";
 import lentils from "@assets/posts/2025-01-08-thats-not-a-lentil/type-of-lentil.jpg";
 import diagram from "@assets/posts/2025-01-08-thats-not-a-lentil/bean-diagram.png";
+import wholeUnhulled from "@assets/posts/2025-01-08-thats-not-a-lentil/whole-unhulled.jpg";
+import wholeHulled from "@assets/posts/2025-01-08-thats-not-a-lentil/whole-hulled.jpg";
+import splitUnhulled from "@assets/posts/2025-01-08-thats-not-a-lentil/split-unhulled.jpg";
+import splitHulled from "@assets/posts/2025-01-08-thats-not-a-lentil/split-hulled.jpg";
+import puyLentils from "@assets/posts/2025-01-08-thats-not-a-lentil/puy-lentils.jpg";
 
 In recent years I have often found myself making recipes that call for some type of small, dry coloured bean. For example:
 
@@ -103,8 +108,9 @@ Let's narrow things down to the specific set of pulses that we're interested in 
 <figure>
   <Image src={lentils} alt="Three different types of lentils (probably)" />
   <figcaption className="text-xs text-center">
-    Image by Justin Cormack on [Wikimedia
-    Commons](https://commons.wikimedia.org/wiki/File:3_types_of_lentil.jpg)
+    Image by [Justin
+    Cormack](https://commons.wikimedia.org/wiki/File:3_types_of_lentil.jpg)
+    (CC-BY-SA 2.0)
   </figcaption>
 </figure>
 
@@ -140,5 +146,131 @@ There are three key features we're interested in:
 - The seed is dicot (it has two parts)
 - There is an inner cotyledon
 - There is an outer seed coat
+
+Pulses are often processed into a different form than they started. The properties above lead naturally to this matrix:
+
+<table>
+  <thead>
+    <tr className="bg-accent accent-foreground">
+      <th colspan="2"></th>
+      <th colspan="2">Seed coat</th>
+    </tr>
+    <tr className="bg-accent accent-foreground">
+      <th colspan="2"></th>
+      <th className="w-5/12">Intact</th>
+      <th className="w-5/12">Removed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td
+        rowspan="2"
+        className="font-bold w-1/12 align-middle bg-accent accent-foreground"
+      >
+        <span
+          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          className="ml-2"
+        >
+          Shape
+        </span>
+      </td>
+      <td className="font-bold text-right bg-accent accent-foreground">
+        Intact
+      </td>
+      <td>
+        <p>whole, unhulled</p>
+        <figure>
+          <Image
+            src={wholeUnhulled}
+            alt="Some whole, unhulled mung beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Mung beans, image by [Ivar
+            Leidus](https://commons.wikimedia.org/wiki/File:Mung_beans_(Vigna_radiata).jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td>
+        <p>whole, hulled</p>
+        <figure>
+          <Image
+            src={wholeHulled}
+            alt="Some whole, hulled mung beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Mung beans, image by [Thamizhpparithi
+            Maari](https://commons.wikimedia.org/wiki/File:Vigna_mungo_without_skin.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td className="font-bold text-right bg-accent accent-foreground">
+        Split
+      </td>
+      <td>
+        <p>split, unhulled</p>
+        <figure>
+          <Image
+            src={splitUnhulled}
+            alt="Some split, unhulled urad beans"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Urad beans, image by [Thamizhpparithi
+            Maari](https://commons.wikimedia.org/wiki/File:Black_gram_with_skin.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td>
+        <p>split, hulled</p>
+        <figure>
+          <Image
+            src={splitHulled}
+            alt="Some split, hulled red lentils"
+            className="w-full"
+          />
+          <figcaption className="text-xs text-center">
+            Lentils, image by [Shijan
+            Kaakkara](https://commons.wikimedia.org/wiki/File:Lentil_-_%E0%B4%AA%E0%B4%B0%E0%B4%BF%E0%B4%AA%E0%B5%8D%E0%B4%AA%E0%B5%8D_02.jpg)
+            (CC-BY-SA 4.0)
+          </figcaption>
+        </figure>
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+Notice, in particular, that the seed coat and cotyledon are often _different colours_. This is why, when you are looking for urad dal to make a 'black dal', you might find yourself looking at a shelf full of white beans. You are looking at beans that have had their seed coats removed to reveal the white cotyledon. It's then not much of a step to infer that the seed coat must be black and so you are probably looking for the whole bean instead.
+
+Of course, this simplicity breaks down somewhere - and it's with lentils. Lentils come in a huge range of varieties, and they have many colours. For example: grey, tan, brown, green and red. There are even some fancy French ones with mottled exteriors.
+
+<figure>
+  <Image
+    src={puyLentils}
+    alt="A wooden bowl of Puy lentils"
+    className="w-1/2 m-auto"
+  />
+  <figcaption className="text-xs text-center">
+    Mottled Puy lentils, image by [Jessica
+    Spengler](https://commons.wikimedia.org/wiki/File:Puy_lentils_wooden_bowl.jpg)
+    (CC-BY 2.0)
+  </figcaption>
+</figure>
+
+## A handy reference
+
+At this point, we've answered most of the questions I had at the start of this post.
+
+These beans are all an unnamed subset of pulses. If a recipe tells you to put yellow split peas in something called a 'moong dal', you should probably look for a different one. Beans with the same name can have different colours due to variety and different processing of the seed coat. And yes, **not everything is a lentil**.
+
+To round things off, I've condensed some useful identification information into this set of handy bean cards.
 
 <BeanDeck client:load />
