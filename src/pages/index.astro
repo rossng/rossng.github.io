@@ -54,6 +54,7 @@ const posts = await getCollection("posts");
             (a, b) =>
               new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
           )
+          .filter((post) => !post.data.draft)
           .map((post) => (
             <li>
               <a href={`/posts/${post.slug}`}>{post.data.title}</a> -{" "}

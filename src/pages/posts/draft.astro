@@ -8,11 +8,11 @@ const posts = await getCollection("posts");
 
 <Layout title="Blog">
   <div class="prose">
-    <h1>Blog</h1>
+    <h1>Draft Posts</h1>
     <ul>
       {
         posts
-          .filter((post) => !post.data.draft)
+          .filter((post) => post.data.draft)
           .map((post) => (
             <li>
               <a href={`/posts/${post.slug}`}>{post.data.title}</a> -{" "}

@@ -18,7 +18,10 @@ export async function getStaticPaths() {
 }
 ---
 
-<Layout title=`Ross Gardiner ⌁ ${post.data.title}`>
-  <PostMeta title={post.data.title} date={post.data.date} />
+<Layout title={`Ross Gardiner ⌁ ${post.data.title}`}>
+  <PostMeta
+    title={`${post.data.draft ? "DRAFT: " : ""} ${post.data.title}`}
+    date={post.data.date}
+  />
   <Content />
 </Layout>
