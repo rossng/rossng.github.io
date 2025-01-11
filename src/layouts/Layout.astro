@@ -1,13 +1,21 @@
 ---
 import Header from "../components/Header.astro";
 import MainContent from "../components/MainContent.astro";
+import { SEO } from "astro-seo";
 
 export interface Props {
   title: string;
   customTitle?: boolean;
+  description?: string;
+  ogType?: string;
 }
 
-const { title, customTitle = false } = Astro.props;
+const {
+  title,
+  customTitle = false,
+  description,
+  ogType = "website",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -25,6 +33,20 @@ const { title, customTitle = false } = Astro.props;
     />
     <meta name="generator" content={Astro.generator} />
     <title>{customTitle ? title : `${title} ⌁ Ross Gardiner`}</title>
+    <SEO
+      title="A Very Descriptive Title"
+      description={description}
+      openGraph={{
+        basic: {
+          title: customTitle ? title : `${title} ⌁ Ross Gardiner`,
+          type: ogType,
+          image: undefined as unknown as string,
+        },
+      }}
+      extend={{
+        link: [{ rel: "icon", href: "/favicon.ico" }],
+      }}
+    />
   </head>
   <body
     class="bg-gradient-to-r from-[#ff7e5f] to-[#feb47b] w-full min-h-screen bg-no-repeat bg-cover"
