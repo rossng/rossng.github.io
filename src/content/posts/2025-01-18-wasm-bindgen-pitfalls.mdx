@@ -1,0 +1,102 @@
+---
+date: 2025-01-18
+title: >
+  Tying yourself in knots with wasm-bindgen and Rust ownership semantics
+draft: true
+---
+
+The Rust WebAssembly tooling is something of a miracle. I can write normal Rust code, sprinkle in a few binding annotations and, for the most part, it _just works™_. It even integrates quite nicely with TypeScript types, [Web APIs](https://crates.io/crates/web-sys) and [Promises/async](https://crates.io/crates/wasm-bindgen-futures).
+
+However, just as you're settling in with a slice of cake and glass of lemonade to write some Rust code for your web application, there is one class of problem waiting to come and stomp all over your nice, type-safe picnic.
+
+The issue is that Rust has strict rules around ownership and borrowing of values. JavaScript:
+
+- is garbage-collected
+- doesn't deal (at the language level) with sharing values between threads
+- uses references for everything except primitives
+
+Thus it has no notion of an 'owned' value, or 'borrowing'. `wasm-bindgen` papers over this difference, making owned values and references look identical from JavaScript-land. However, many rules _are_ enforced at runtime.
+
+Let's look at a couple of common pitfalls. These can be found in my [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls). I'll add more as I find them.
+
+## Accidental loss of ownership
+
+Since Rust doesn't have a garbage collector, it needs other techniques for knowing when to clean things up. If a value is _owned_, one of two things can happen to it during the execution of the function:
+
+- ownership can be transferred, e.g. by passing it to another function or returning it
+- it is dropped at the end of the function
+
+This second one can pose quite a significant problem for us. Consider this Rust code:
+
+```rust
+use wasm_bindgen::prelude::*;
+use web_sys::console;
+
+#[wasm_bindgen]
+pub struct Foo;
+
+#[wasm_bindgen]
+impl Foo {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Foo {
+        Foo
+    }
+}
+
+#[wasm_bindgen(js_name = "borrowFoo")]
+pub fn borrow_foo(_foo: &Foo) {
+    console::log_1(&"Rust: borrowed a Foo".into());
+}
+
+#[wasm_bindgen(js_name = "consumeFoo")]
+pub fn consume_foo(_foo: Foo) {
+    console::log_1(&"Rust: consumed a Foo".into());
+}
+```
+
+Here we have two functions that can take a `Foo`: `borrow_foo` by reference and `consume_foo` by move (ownership). Our TypeScript code looks like this:
+
+```typescript
+import { consumeFoo, borrowFoo, Foo } from "lib";
+
+const foo = new Foo();
+
+// Borrow foo (works)
+borrowFoo(foo);
+
+// Consume foo (works)
+consumeFoo(foo); // <- transfers ownership of foo to the Rust function
+// foo is dropped when the Rust function returns
+
+// Borrow foo again (fails)
+borrowFoo(foo); // <- foo is not valid anymore
+```
+
+First, we call `borrowFoo(foo)` which borrows `foo`. When the function finishes executing Rust does nothing, since it knows that some other location in the code is responsible for owning and disposing of `foo`.
+
+Next, we call `consumeFoo(foo)`. This function assumes ownership of the `foo`. When the function reaches its end, it still owns the value `foo`. The value will not be returned to the caller, so it may leak heap memory if not cleaned up now. Rust calls `Drop::drop` to destroy the object.
+
+Finally, we call `borrowFoo(foo)` again. At this point, `foo` is already invalid. An exception is thrown immediately:
+
+```
+Rust: borrowed a Foo
+Rust: consumed a Foo
+error: Uncaught (in promise) Error: null pointer passed to rust
+    throw new Error(getStringFromWasm0(arg0, arg1));
+          ^
+    at __wbindgen_throw (rust-wasm-pitfalls/lib-js/lib_bg.js:319:11)
+    at <anonymous> (wasm://wasm/000288f6:1:34448)
+    at <anonymous> (wasm://wasm/000288f6:1:34422)
+    at <anonymous> (wasm://wasm/000288f6:1:24106)
+    at borrowFoo (rust-wasm-pitfalls/lib-js/lib_bg.js:87:10)
+    at rust-wasm-pitfalls/examples/losing-ownership.ts:13:1
+```
+
+### Avoiding the error
+
+It would be nice if we could solve this at the type-system level. Unfortunately for us, TypeScript cannot express this idea that a function can consume a value - this would require support for linear/affine types. That means you have two options:
+
+- be really careful not to re-use values after relinquishing ownership to a Rust function. You could adopt a naming convention (like `consumeFoo`, or naming parameters like `owned_foo`) to help with this.
+- only use reference parameters in functions exposed to JavaScript (unless the type is `Copy`)
+
+## Holding mutable references across `await`
