@@ -7,7 +7,7 @@ draft: true
 
 The Rust WebAssembly tooling is something of a miracle. I can write normal Rust code, sprinkle in a few binding annotations and, for the most part, it _just works™_. It even integrates quite nicely with TypeScript types, [Web APIs](https://crates.io/crates/web-sys) and [Promises/async](https://crates.io/crates/wasm-bindgen-futures).
 
-However, just as you're settling in with a slice of cake and glass of lemonade to write some Rust code for your web application, there is one class of problem waiting to come and stomp all over your nice, type-safe picnic.
+However, just as you're settling in with a slice of cake and glass of lemonade to write some Rust code for your web application, one class of problem is waiting to come and stomp all over your nice, type-safe picnic.
 
 The issue is that Rust has strict rules around ownership and borrowing of values. JavaScript:
 
@@ -23,7 +23,7 @@ Let's look at a couple of common pitfalls. These can be found in my [rust-wasm-p
 
 Since Rust doesn't have a garbage collector, it needs other techniques for knowing when to clean things up. If a value is _owned_, one of two things can happen to it during the execution of the function:
 
-- ownership can be transferred, e.g. by passing it to another function or returning it
+- ownership is transferred, e.g. by passing it to another function or returning it
 - it is dropped at the end of the function
 
 This second one can pose quite a significant problem for us. Consider this Rust code:
