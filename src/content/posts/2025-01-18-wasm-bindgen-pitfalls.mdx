@@ -1,7 +1,7 @@
 ---
 date: 2025-01-18
 title: >
-  Tying yourself in knots with wasm-bindgen and Rust ownership semantics
+  How to crash your software with Rust and wasm-bindgen
 draft: true
 ---
 
@@ -28,7 +28,7 @@ The key library used for generating JavaScript bindings, [wasm-bindgen](https://
 
 Let's look at a couple of common pitfalls. The full code for these examples can be found in the [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls).
 
-## Accidental loss of ownership
+## Pitfall 1: Accidental loss of ownership
 
 Since Rust doesn't have a garbage collector, it needs other techniques for knowing when to clean things up. If a value is _owned_, it can be in one of two states at the end of the function:
 
@@ -127,7 +127,7 @@ It would be nice if we could solve this at the type-system level. Unfortunately 
 
 Could static analysis help us here? It seems very tricky to implement something that detects ownership transfer and prevents later use of the object in JavaScript. Another possibility is that wasm-bindgen could detect exposed functions that take non-`Copy` owned values. This seems a lot more tractable.
 
-## Holding mutable references across `await`
+## Pitfall 2: Holding mutable references across `await`
 
 By installing [wasm-bindgen-futures](https://crates.io/crates/wasm-bindgen-futures) we get a bridge between async Rust and async JavaScript. You can expose bindings for an `async fn foo()` and await it in JavaScript with `await foo()`.
 
@@ -242,24 +242,26 @@ error: Uncaught Error: recursive use of an object detected which would lead to u
     at eventLoopTick (ext:core/01_core.js:210:13)
 ```
 
-The JavaScript code is a somewhat contrived example of how we might end up calling `use_bar` while `use_mut_bar` is still incomplete. By calling `setTimeout(fn, 0)`, we push the execution of some `fn` onto the async task queue. The `fn` will start running when all the tasks ahead of it have yielded for some reason - normally because they are waiting on something like a network request.
+This is a (somewhat contrived) example of how `use_bar` can get called while `use_mut_bar` is still in-progress and holding the mutable reference to `bar`.
 
-The `sleep` call in `use_mut_bar` function yields to the async runtime, which allows `use_bar` to start executing. The wasm-bindgen runtime keeps track of borrows and can detect that we are attempting to create an immutable reference while a mutable reference already exists. So it throws the 'recursive use of an object' exception.
+By calling `setTimeout(() => useBar(bar), 0)`, we push the execution of `useBar(bar)` onto the async task queue. It will start running when all the tasks ahead of it have yielded for some reason. In normal applications this will happen because they are waiting on something (e.g. a network request).
+
+We call `use_mut_bar(bar)`, which itself calls `sleep` and yields. `use_bar(bar)` can then start executing. The wasm-bindgen runtime keeps track of borrows and detects that we are attempting to create an immutable reference while a mutable reference already exists. It then throws the 'recursive use of an object' exception.
 
 ### A real-world example
 
 Initially, it seems that it would be difficult to accidentally trigger this scenario. But it is not. Imagine that you have a React application. One of your React components is rendered from a Rust object. There are getters like `fn get_foo(&self)` which retrieve data to be displayed on the screen.
 
-The user clicks a button, and you start updating the Rust object by calling `async fn update_bar(&mut self)`. At some point, the function yields (since this is the raison d'etre of async functions!). At this exact moment, React decides to start re-rendering the component. It calls `get_foo` again and bam! Exception thrown.
+The user clicks a button, which starts an update of the Rust object by calling `async fn update_bar(&mut self)`. At some point, this function yields. While the async function is paused, React decides to start re-rendering the component. It calls `get_foo` again and bam! Exception thrown.
 
 ### Avoiding the error
 
-This is a tricky one. Async functions taking mutable references are obviously very useful, but if we don't very carefully manage our calling pattern it's almost inevitable that crashes will arise. Perhaps under some limited circumstances it is possible to do this, but it's not a viable strategy when using a framework (e.g. React) that 'calls you'.
+This is a tricky one. Async functions taking mutable references are obviously very useful but, if we don't very carefully manage our calling pattern, crashes are almost inevitable. If you are using a framework (e.g. React) that 'calls you', it seems near-impossible to avoid the bad cases.
 
-So my recommendation would be simply to never hold a mutable reference across any `await` if the object in question is visible to the JavaScript side of the application. Find ways to separate out the async operations from the mutation logic, and call two separate functions sequentially instead. You may be better off using immutable Rust objects that are always copied upon mutation.
+My recommendation would be: if a Rust object is visible to JavaScript, never hold a mutable reference to it across an `await`. Instead, find a way to separate the async operation from the mutation logic, and call two separate functions sequentially instead. You may be better off avoiding mutation entirely and using copyable, immutable Rust objects.
 
 ## Conclusion
 
-In this post, we looked at a couple of ownership-related situations that can lead to crashes when using your Rust object from JavaScript. There doesn't appear to be any silver bullet solution for these problems: fixing them properly would require some heavyweight static analysis tooling.
+In this post, we looked at a couple of ownership-related situations that can lead to crashes when using a Rust object from JavaScript. There is no obvious silver bullet for these problems, and a proper fix would require some heavyweight static analysis tooling.
 
-I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below. If there are other interesting scenarios, I'd like to add them to the [examples repo](https://github.com/rossng/rossng-wasm-pitfalls).
+I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below! I'd like to add more scenarios to the [examples repo](https://github.com/rossng/rossng-wasm-pitfalls).
