@@ -5,28 +5,39 @@ title: >
 draft: true
 ---
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@assets/components/ui/alert";
+import { LibraryBig } from "lucide-react";
+
 The Rust WebAssembly tooling is something of a miracle. I can write normal Rust code, sprinkle in a few binding annotations and, for the most part, it _just works™_. It even integrates quite nicely with TypeScript types, [Web APIs](https://crates.io/crates/web-sys) and [Promises/async](https://crates.io/crates/wasm-bindgen-futures).
 
 However, just as you're settling in with a slice of cake and glass of lemonade to write some Rust code for your web application, one class of problem is waiting to come and stomp all over your nice, type-safe picnic.
 
-The issue is that Rust has strict rules around ownership and borrowing of values. JavaScript:
+The issue is that Rust has strict rules around ownership and borrowing of values. In contrast, JavaScript:
 
 - is garbage-collected
 - doesn't deal (at the language level) with sharing values between threads
-- uses references for everything except primitives
+- uses references for everything (except primitives)
 
-Thus it has no notion of an 'owned' value, or 'borrowing'. `wasm-bindgen` papers over this difference, making owned values and references look identical from JavaScript-land. However, many rules _are_ enforced at runtime.
+JavaScript thus has no notion of an 'owned' value, or 'borrowing'.
 
-Let's look at a couple of common pitfalls. These can be found in my [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls). I'll add more as I find them.
+The key library used for generating JavaScript bindings, [wasm-bindgen](https://crates.io/crates/wasm-bindgen), papers over this difference. Whether you use owned values and references, they look identical from JavaScript-land. However, many rules _are_ enforced at runtime - the worst time to discover that your code is wrong.
+
+Let's look at a couple of common pitfalls. The full code for these examples can be found in the [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls).
 
 ## Accidental loss of ownership
 
-Since Rust doesn't have a garbage collector, it needs other techniques for knowing when to clean things up. If a value is _owned_, one of two things can happen to it during the execution of the function:
+Since Rust doesn't have a garbage collector, it needs other techniques for knowing when to clean things up. If a value is _owned_, it can be in one of two states at the end of the function:
 
-- ownership is transferred, e.g. by passing it to another function or returning it
-- it is dropped at the end of the function
+- ownership was transferred, e.g. by passing it to another function or returning it
+- it is still owned
 
-This second one can pose quite a significant problem for us. Consider this Rust code:
+In the second case, it is now safe to clean up the owned value. (If you're familiar with RAII in C++, it's the same thing.)
+
+This can pose a problem when calling Rust functions from JavaScript. Consider this Rust code:
 
 ```rust
 use wasm_bindgen::prelude::*;
@@ -54,7 +65,22 @@ pub fn consume_foo(_foo: Foo) {
 }
 ```
 
-Here we have two functions that can take a `Foo`: `borrow_foo` by reference and `consume_foo` by move (ownership). Our TypeScript code looks like this:
+Here we have two functions that can take a `Foo`: `borrow_foo` by reference and `consume_foo` by move (ownership).
+
+<Alert className="bg-accent text-accent-foreground drop-shadow-md">
+  <LibraryBig className="h-4 w-4" />
+  <AlertTitle>What is all this `#[wasm_bindgen]` stuff?</AlertTitle>
+  <AlertDescription>
+    <p>
+      The `#[wasm_bindgen]` attributes mark functions and types for which
+      wasm-bindgen should generate JavaScript bindings. For example, the `Foo`
+      struct becomes a JavaScript class and the Rust functions become JavaScript
+      functions.
+    </p>
+  </AlertDescription>
+</Alert>
+
+Our TypeScript code looks like this:
 
 ```typescript
 import { consumeFoo, borrowFoo, Foo } from "lib";
@@ -72,7 +98,7 @@ consumeFoo(foo); // <- transfers ownership of foo to the Rust function
 borrowFoo(foo); // <- foo is not valid anymore
 ```
 
-First, we call `borrowFoo(foo)` which borrows `foo`. When the function finishes executing Rust does nothing, since it knows that some other location in the code is responsible for owning and disposing of `foo`.
+First, we call `borrowFoo(foo)` which borrows `foo`. When the function finishes executing Rust does nothing - it doesn't own the value.
 
 Next, we call `consumeFoo(foo)`. This function assumes ownership of the `foo`. When the function reaches its end, it still owns the value `foo`. The value will not be returned to the caller, so it may leak heap memory if not cleaned up now. Rust calls `Drop::drop` to destroy the object.
 
@@ -94,10 +120,12 @@ error: Uncaught (in promise) Error: null pointer passed to rust
 
 ### Avoiding the error
 
-It would be nice if we could solve this at the type-system level. Unfortunately for us, TypeScript cannot express this idea that a function can consume a value - this would require support for linear/affine types. That means you have two options:
+It would be nice if we could solve this at the type-system level. Unfortunately for us, TypeScript cannot express this idea that a function can consume a value, which would require support for linear/affine types. That leaves us with two options:
 
 - be really careful not to re-use values after relinquishing ownership to a Rust function. You could adopt a naming convention (like `consumeFoo`, or naming parameters like `owned_foo`) to help with this.
 - only use reference parameters in functions exposed to JavaScript (unless the type is `Copy`)
+
+Could static analysis help us here? It seems very tricky to implement something that detects ownership transfer and prevents later use of the object in JavaScript. Another possibility is that wasm-bindgen could detect exposed functions that take non-`Copy` owned values. This seems a lot more tractable.
 
 ## Holding mutable references across `await`
 
@@ -105,7 +133,7 @@ By installing [wasm-bindgen-futures](https://crates.io/crates/wasm-bindgen-futur
 
 In normal Rust, imagine that we write this:
 
-```
+```rust
 use std::time::Duration;
 use async_std::task::sleep;
 
@@ -140,7 +168,7 @@ pub async fn wont_compile() {
 }
 ```
 
-In this example, we call the same function in the same order but we do not await `use_mut_bar`. Instead, we store its future in the local variable `fut`. The compiler will complain that we `cannot borrow `bar` as immutable` on the line `use_bar(&bar)`.
+In this example, we call the same functions in the same order but we do not await `use_mut_bar`. Instead, we store its future in the local variable `fut`. The compiler will complain about `use_bar(&bar)`: you `cannot borrow `bar` as immutable`.
 
 This is because the incomplete future `fut` still owns the mutable reference to `bar`, and we might continue to execute it. The compiler will not allow us to take another immutable reference while this is still the case.
 
@@ -234,4 +262,4 @@ So my recommendation would be simply to never hold a mutable reference across an
 
 In this post, we looked at a couple of ownership-related situations that can lead to crashes when using your Rust object from JavaScript. There doesn't appear to be any silver bullet solution for these problems: fixing them properly would require some heavyweight static analysis tooling.
 
-I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below.
+I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below. If there are other interesting scenarios, I'd like to add them to the [examples repo](https://github.com/rossng/rossng-wasm-pitfalls).
