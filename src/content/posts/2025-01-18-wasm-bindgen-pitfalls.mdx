@@ -100,3 +100,138 @@ It would be nice if we could solve this at the type-system level. Unfortunately 
 - only use reference parameters in functions exposed to JavaScript (unless the type is `Copy`)
 
 ## Holding mutable references across `await`
+
+By installing [wasm-bindgen-futures](https://crates.io/crates/wasm-bindgen-futures) we get a bridge between async Rust and async JavaScript. You can expose bindings for an `async fn foo()` and await it in JavaScript with `await foo()`.
+
+In normal Rust, imagine that we write this:
+
+```
+use std::time::Duration;
+use async_std::task::sleep;
+
+pub struct Bar;
+
+pub async fn use_mut_bar(_bar: &mut Bar) -> () {
+    sleep(Duration::from_secs(1)).await;
+}
+
+pub fn use_bar(_bar: &Bar) -> () {
+}
+
+
+pub async fn will_compile() {
+    let mut bar = Bar;
+
+    use_mut_bar(&mut bar).await;
+    use_bar(&bar);
+}
+```
+
+This works just fine. `use_mut_bar` takes a mutable reference to `bar`. We await `use_mut_bar` until it completes and relinquishes the mutable borrow. Then we can call `use_bar` with an immutable reference to the same `bar`.
+
+This order of operations strictly preserves the condition that a value cannot be mutably _and_ immutably borrowed at the same time. However, look what happens if we change the implementation a little:
+
+```rust
+pub async fn wont_compile() {
+    let mut bar = Bar;
+
+    let fut = use_mut_bar(&mut bar);
+    use_bar(&bar);
+}
+```
+
+In this example, we call the same function in the same order but we do not await `use_mut_bar`. Instead, we store its future in the local variable `fut`. The compiler will complain that we `cannot borrow `bar` as immutable` on the line `use_bar(&bar)`.
+
+This is because the incomplete future `fut` still owns the mutable reference to `bar`, and we might continue to execute it. The compiler will not allow us to take another immutable reference while this is still the case.
+
+This is great: the Rust compiler is protecting us from a potential hazard. However, no such protection mechanism exists when calling `use_mut_bar` and `use_bar` from JavaScript.
+
+Let's look now at the same code, marked up for wasm-bindgen:
+
+```rust
+use std::time::Duration;
+
+use async_std::task::sleep;
+use wasm_bindgen::prelude::*;
+use web_sys::console;
+
+#[wasm_bindgen]
+pub struct Bar;
+
+#[wasm_bindgen]
+impl Bar {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Bar {
+        Bar
+    }
+}
+
+#[wasm_bindgen(js_name = "useMutBar")]
+pub async fn use_mut_bar(_bar: &mut Bar) -> () {
+    console::log_1(&"Rust: use_mut_bar".into());
+
+    sleep(Duration::from_secs(1)).await;
+
+    console::log_1(&"Rust: use_mut_bar done".into());
+}
+
+#[wasm_bindgen(js_name = "useBar")]
+pub fn use_bar(_bar: &Bar) -> () {
+    console::log_1(&"Rust: use_bar".into());
+}
+```
+
+And here is a example of how we can cause a hazardous situation by calling these functions from JavaScript:
+
+```typescript
+import { Bar, useBar, useMutBar } from "lib";
+
+const bar = new Bar();
+
+// Schedule `useBar` to run when the current task yields
+// `useBar` takes an immutable reference to `bar`
+setTimeout(() => useBar(bar), 0);
+
+// Start running `useMutBar` immediately
+// `useMutBar` takes a mutable reference to `bar`
+await useMutBar(bar);
+```
+
+This code crashes with a somewhat cryptic error. Why?
+
+```
+Rust: use_mut_bar
+error: Uncaught Error: recursive use of an object detected which would lead to unsafe aliasing in rust
+    throw new Error(getStringFromWasm0(arg0, arg1));
+          ^
+    at __wbindgen_throw (rust-wasm-pitfalls/lib-js/lib_bg.js:317:11)
+    at <anonymous> (wasm://wasm/00026f8a:1:32920)
+    at <anonymous> (wasm://wasm/00026f8a:1:32909)
+    at <anonymous> (wasm://wasm/00026f8a:1:24196)
+    at useBar (rust-wasm-pitfalls/lib-js/lib_bg.js:114:10)
+    at rust-wasm-pitfalls/examples/mut-async.ts:7:18
+    at callback (ext:deno_web/02_timers.js:58:7)
+    at eventLoopTick (ext:core/01_core.js:210:13)
+```
+
+The JavaScript code is a somewhat contrived example of how we might end up calling `use_bar` while `use_mut_bar` is still incomplete. By calling `setTimeout(fn, 0)`, we push the execution of some `fn` onto the async task queue. The `fn` will start running when all the tasks ahead of it have yielded for some reason - normally because they are waiting on something like a network request.
+
+The `sleep` call in `use_mut_bar` function yields to the async runtime, which allows `use_bar` to start executing. The wasm-bindgen runtime keeps track of borrows and can detect that we are attempting to create an immutable reference while a mutable reference already exists. So it throws the 'recursive use of an object' exception.
+
+### A real-world example
+
+Initially, it seems that it would be difficult to accidentally trigger this scenario. But it is not. Imagine that you have a React application. One of your React components is rendered from a Rust object. There are getters like `fn get_foo(&self)` which retrieve data to be displayed on the screen.
+
+The user clicks a button, and you start updating the Rust object by calling `async fn update_bar(&mut self)`. At some point, the function yields (since this is the raison d'etre of async functions!). At this exact moment, React decides to start re-rendering the component. It calls `get_foo` again and bam! Exception thrown.
+
+### Avoiding the error
+
+This is a tricky one. Async functions taking mutable references are obviously very useful, but if we don't very carefully manage our calling pattern it's almost inevitable that crashes will arise. Perhaps under some limited circumstances it is possible to do this, but it's not a viable strategy when using a framework (e.g. React) that 'calls you'.
+
+So my recommendation would be simply to never hold a mutable reference across any `await` if the object in question is visible to the JavaScript side of the application. Find ways to separate out the async operations from the mutation logic, and call two separate functions sequentially instead. You may be better off using immutable Rust objects that are always copied upon mutation.
+
+## Conclusion
+
+In this post, we looked at a couple of ownership-related situations that can lead to crashes when using your Rust object from JavaScript. There doesn't appear to be any silver bullet solution for these problems: fixing them properly would require some heavyweight static analysis tooling.
+
+I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below.
