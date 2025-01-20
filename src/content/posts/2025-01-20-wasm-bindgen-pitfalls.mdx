@@ -1,8 +1,7 @@
 ---
-date: 2025-01-18
+date: 2025-01-20
 title: >
   How to crash your software with Rust and wasm-bindgen
-draft: true
 ---
 
 import {
@@ -125,7 +124,7 @@ It would be nice if we could solve this at the type-system level. Unfortunately 
 - be really careful not to re-use values after relinquishing ownership to a Rust function. You could adopt a naming convention (like `consumeFoo`, or naming parameters like `owned_foo`) to help with this.
 - only use reference parameters in functions exposed to JavaScript (unless the type is `Copy`)
 
-Could static analysis help us here? It seems very tricky to implement something that detects ownership transfer and prevents later use of the object in JavaScript. Another possibility is that wasm-bindgen could detect exposed functions that take non-`Copy` owned values. This seems a lot more tractable.
+Could static analysis help us here? It seems very tricky to implement something that detects ownership transfer and prevents later use of the object in JavaScript. However, it seems plausible to implement a lint (with clippy, [dylint](https://github.com/trailofbits/dylint) or even wasm-bindgen itself) that warns you when a function with JavaScript bindings takes non-`Copy` owned values.
 
 ## Pitfall 2: Holding mutable references across `await`
 
@@ -265,3 +264,5 @@ My recommendation would be: if a Rust object is visible to JavaScript, never hol
 In this post, we looked at a couple of ownership-related situations that can lead to crashes when using a Rust object from JavaScript. There is no obvious silver bullet for these problems, and a proper fix would require some heavyweight static analysis tooling.
 
 I'm interested to hear about any other pitfalls you've encountered while using wasm-bindgen. Do you have ideas for avoiding the situations outlined above? Let me know below! I'd like to add more scenarios to the [examples repo](https://github.com/rossng/rossng-wasm-pitfalls).
+
+_Thanks to my colleague [Bouke](https://bou.ke/) for his feedback on this post._
