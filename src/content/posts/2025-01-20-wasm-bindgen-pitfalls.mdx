@@ -23,7 +23,7 @@ The issue is that Rust has strict rules around ownership and borrowing of values
 
 JavaScript thus has no notion of an 'owned' value, or 'borrowing'.
 
-The key library used for generating JavaScript bindings, [wasm-bindgen](https://crates.io/crates/wasm-bindgen), papers over this difference. Whether you use owned values and references, they look identical from JavaScript-land. However, many rules _are_ enforced at runtime - the worst time to discover that your code is wrong.
+The key library used for generating JavaScript bindings, [wasm-bindgen](https://crates.io/crates/wasm-bindgen), papers over this difference. Whether you use owned values or references, they look identical from JavaScript-land. However, many rules _are_ enforced at runtime - the worst time to discover that your code is wrong.
 
 Let's look at a couple of common pitfalls. The full code for these examples can be found in the [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls).
 
@@ -128,7 +128,7 @@ Could static analysis help us here? It seems very tricky to implement something 
 
 ## Pitfall 2: Holding mutable references across `await`
 
-By installing [wasm-bindgen-futures](https://crates.io/crates/wasm-bindgen-futures) we get a bridge between async Rust and async JavaScript. You can expose bindings for an `async fn foo()` and await it in JavaScript with `await foo()`.
+By installing [wasm-bindgen-futures](https://crates.io/crates/wasm-bindgen-futures), we get a bridge between async Rust and async JavaScript. You can expose bindings for an `async fn foo()` and await it in JavaScript with `await foo()`.
 
 In normal Rust, imagine that we write this:
 
@@ -208,7 +208,7 @@ pub fn use_bar(_bar: &Bar) -> () {
 }
 ```
 
-And here is a example of how we can cause a hazardous situation by calling these functions from JavaScript:
+And here is an example of how we can cause a hazardous situation by calling these functions from JavaScript:
 
 ```typescript
 import { Bar, useBar, useMutBar } from "lib";
@@ -255,7 +255,7 @@ The user clicks a button, which starts an update of the Rust object by calling `
 
 ### Avoiding the error
 
-This is a tricky one. Async functions taking mutable references are obviously very useful but, if we don't very carefully manage our calling pattern, crashes are almost inevitable. If you are using a framework (e.g. React) that 'calls you', it seems near-impossible to avoid the bad cases.
+This is a tricky one. Async functions taking mutable references are obviously very useful but, if we do not very carefully manage our calling pattern, crashes are almost inevitable. If you are using a framework (e.g. React) that 'calls you', it seems near-impossible to avoid the bad cases.
 
 My recommendation would be: if a Rust object is visible to JavaScript, never hold a mutable reference to it across an `await`. Instead, find a way to separate the async operation from the mutation logic, and call two separate functions sequentially instead. You may be better off avoiding mutation entirely and using copyable, immutable Rust objects.
 
