@@ -1,0 +1,66 @@
+---
+title: >
+  tinted.stream - my very own single-serving site
+date: 2025-02-10
+---
+
+import screenshot from "@assets/posts/2025-02-10-tinted-stream/tinted-stream.png";
+import { Image } from "astro:assets";
+
+From time to time, I just want to display a single block colour on my computer's entire screen. So I Google something like 'fullscreen solid colour' and just click links until I find something that works.
+
+But each time, I get a small papercut from the state of the web today. Here are the results Google serves me:
+
+1. _Full Black Screen, White Screen & Color Screen Tool_ - {<span className="text-gray-500">https://www.fullscreen.one</span>}
+
+   This one immediately pops up a huge modal cookie banner. It requires eight (eight!) clicks to disable everything and wants to send my data to literally hundreds of companies.
+
+1. _Color Aurlien_ - {<span className="text-gray-500">http://color.aurlien.net</span>}
+
+   No fullscreen button. Neat UI but kinda difficult to control what colour you select.
+
+1. _Full Screen Red Color - PiliApp_ - {<span className="text-gray-500">https://www.piliapp.com/screen/red</span>}
+
+   Can't choose an arbitrary colour. Hard to remember the URL.
+
+1. _Black Screen - Make your screen DAZZLING!_ - {<span className="text-gray-500">https://www.fullblackscreen.com</span>}
+
+   The exact same terrible cookie banner as the first result.
+
+1. Three irrelevant results from the Microsoft forums and Reddit
+1. A tool for generating solid colour PNGs
+1. _colorscreen.io_ - {<span className="text-gray-500">https://colorscreen.io</span>}
+
+   A non-functional parked domain. How did this make it to the first page of the results?
+
+On page 5, you reach the first decent result: _whitetestscreen.com_. But it uses `<input type="color">` for its colour picker which (as a Firefox on macOS user) is rather clunky.
+
+---
+
+It turns out that TLDs like `.top` and `.stream` are dirt cheap. So I built a [single-serving site](https://singleservingsites.cool/) to scratch my own itch.
+
+{
+
+<div className="flex flex-col items-center">
+  <a
+    href="https://tinted.stream"
+    title="Open tinted.stream in a new tab to show a solid colour in fullscreen"
+    target="_blank"
+    className="mx-auto rounded border-2 border-black bg-gradient-to-b from-[#ff7e5f] to-[#feb47b] p-5 text-2xl text-black no-underline hover:bg-gradient-to-b hover:from-[#feb47b] hover:to-[#ff7e5f]"
+  >
+    tinted.stream
+  </a>
+</div>
+}
+
+---
+
+<Image
+  src={screenshot}
+  alt="Screenshot of tinted.stream"
+  class="rounded shadow-lg"
+/>
+
+I'll probably add a few more input fields in future (e.g. hex RGB strings). Tell me below if you see a need for something specific.
+
+I haven't employed any black hat SEO (or spelled the word colour 'correctly'), so I look forward to Google ignoring the site entirely. Hopefully someone finds it useful though. I'll never know, because I didn't add any tracking.
