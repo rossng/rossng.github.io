@@ -1,0 +1,251 @@
+---
+title: >
+  Pitfalls of wasm-bindgen, part 2: vec parameters
+date: 2025-02-22
+---
+
+In the [previous post](/posts/2025-01-20-wasm-bindgen-pitfalls), I explored some pitfalls I have encountered while using [wasm-bindgen](https://crates.io/crates/wasm-bindgen).
+
+In this post I'll look at another tricky area: passing arrays of Rust objects _back into_ your Rust code from JavaScript.
+
+You can also find these examples in the [rust-wasm-pitfalls repository](https://github.com/rossng/rossng-wasm-pitfalls).
+
+## The happy path
+
+If we want to expose a Rust function which takes an array of some common primitive type, wasm-bindgen makes it easy.
+
+```rust
+use wasm_bindgen::prelude::*;
+use web_sys::console;
+
+#[wasm_bindgen(js_name = "useJsVec")]
+pub fn use_js_vec(vec: Vec<String>) {
+    console::log_1(&format!("Rust: use_js_vec {:?}", vec).into());
+}
+```
+
+This code generates the TypeScript type `function useJsVec(vec: string[]): void`. Nice! We can just pass in normal JavaScript arrays and everything works as expected:
+
+```typescript
+import { useJsVec } from "lib";
+
+const arr1 = ["foo", "bar", "baz"];
+useJsVec(arr1); // <- new Vec<String> created by copying data from the JavaScript array
+useJsVec(arr1); // <- succeeds again
+```
+
+You can also do this with numeric vectors, for which wasm-bindgen will generate bindings for typed JavaScript arrays. `Vec<i32>` becomes `Int32Array`, for example. Slightly annoying for JavaScript ergonomics, but good for type safety.
+
+## The unhappy path
+
+Soon enough, you will encounter a case where you want to pass several _Rust_ objects from your JavaScript code. Let's try that:
+
+```rust
+#[wasm_bindgen]
+#[derive(Debug)]
+pub struct Baz;
+
+#[wasm_bindgen]
+impl Baz {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Baz {
+        Baz
+    }
+}
+
+#[wasm_bindgen(js_name = "useRsVec")]
+pub fn use_rs_vec(vec: Vec<Baz>) {
+    console::log_1(&format!("Rust: use_rs_vec {:?}", vec).into());
+}
+```
+
+Those of you who were paying attention last time will have spotted something: ownership of the `Baz` objects will be transferred to the Rust code when calling `useRsVec`. When the function ends, they will be dropped.
+
+Consequently, you cannot do this:
+
+```typescript
+const arr2 = [new Baz(), new Baz(), new Baz()];
+
+useRsVec(arr2); // <- transfers ownership of all the Baz instances
+// All Baz instances are dropped when the Rust function returns
+
+useRsVec(arr2); // <- throws an exception
+```
+
+I consider this very annoying. I don't want my JavaScript application to crash because of invisible Rust ownership rules.
+
+## The hunt for a solution
+
+### Vector of references
+
+One idea comes to mind immediately: just type the parameter as `Vec<&Baz>` and the problem will go away.
+
+```rust
+#[wasm_bindgen(js_name = "useRefVec")]
+pub fn use_ref_vec(vec: Vec<&Baz>) {
+    console::log_1(&format!("Rust: use_ref_vec {:?}", vec).into());
+}
+```
+
+Well, yes. But also no. You will get the following compiler error:
+
+```
+the trait bound `&Baz: JsObject` is not satisfied
+required for `&Baz` to implement `VectorFromWasmAbi`
+required for `Vec<&Baz>` to implement `FromWasmAbi`
+```
+
+Apparently wasm-bindgen just doesn't support this right now. Is it a fundamental limitation? I don't think so - maybe things will change in the future.
+
+### Some things that are a bit like a vector of references
+
+The next obvious option is to try to find a type something with the following properties:
+
+- it behaves roughly like a vector of references
+- wasm-bindgen can handle it
+
+I've had no luck here. Some things that don't work:
+
+- Hiding the `Vec` inside a custom wrapper:
+
+  ```rust
+  #[wasm_bindgen]
+  pub struct BazVec<'a>(Vec<&'a Baz>);
+  ```
+
+  wasm-bindgen doesn't support lifetime parameters in structs. You can mark your `Baz` references `'static` if you're okay with leaking them forever (you probably aren't!).
+
+- Passing a borrowed slice:
+
+  ```rust
+  #[wasm_bindgen(js_name = "useSlice")]
+  pub fn use_slice(vec: &[Baz]) {
+      console::log_1(&format!("Rust: use_slice {:?}", vec).into());
+  }
+  ```
+
+  wasm-bindgen also doesn't support this.
+
+## Choosing a poison
+
+There are two more options that I'm aware of, each with some tradeoff.
+
+### Option 1: manual cloning
+
+One way to avoid losing the objects when we pass them into a Rust function is to clone them beforehand. We can extend the definition of `Baz` slightly to expose cloning to JavaScript:
+
+```rust
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+#[derive(Debug, Clone)]
+pub struct Baz;
+
+#[wasm_bindgen]
+impl Baz {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Baz {
+        Baz
+    }
+
+    #[wasm_bindgen]
+    pub fn clone(&self) -> Self {
+        Clone::clone(self)
+    }
+}
+```
+
+Then use it like so:
+
+```typescript
+const arr3 = [new Baz(), new Baz(), new Baz()];
+
+useRsVec(arr3.map((baz) => baz.clone()));
+useRsVec(arr3.map((baz) => baz.clone())); // <- succeeds a second time
+```
+
+The downside? This comes at quite some ergonomic cost on the JavaScript side, since you must always remember to call `clone()`.
+
+### Option 2: accepting a `JsValue`
+
+If the priority is better ergonomics for the JavaScript consumers of our Rust code, there is another option. We can have our Rust function operate directly on the JavaScript array, and recover (clones of) each of the Rust objects from their JavaScript pointer objects.
+
+This requires a bit of black magic, so I'll just let the code do the talking. Note that `use_extern_vec` could just accept a `JsValue` directly, but using `ArrayBaz` allows us to emit better TypeScript types.
+
+```rust
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Array<Baz>")]
+    pub type ArrayBaz;
+}
+
+pub fn from_js_value<A: Clone + RefFromWasmAbi<Abi = u32>>(js: JsValue) -> A {
+    let ptr = JsValue::from_str("__wbg_ptr");
+    #[allow(unused_unsafe)]
+    let ptr = unsafe { Reflect::get(&js, &ptr).unwrap() };
+    let id = ptr.as_f64().unwrap() as u32;
+    unsafe { A::ref_from_abi(id).clone() }
+}
+
+impl TryInto<Vec<Baz>> for ArrayBaz {
+    type Error = JsValue;
+
+    fn try_into(self) -> Result<Vec<Baz>, Self::Error> {
+        Ok(js_sys::try_iter(&self)?
+            .ok_or::<JsValue>(JsError::new("Iterator not iterable").into())?
+            .map(|item| {
+                let location = item.unwrap();
+                from_js_value::<Baz>(location)
+            })
+            .map(|l| l.into())
+            .collect())
+    }
+}
+
+#[wasm_bindgen(js_name = "useExternVec")]
+pub fn use_extern_vec(vec: ArrayBaz) {
+    let vec: Vec<Baz> = vec.try_into().unwrap();
+    console::log_1(&format!("Rust: use_extern_vec {:?}", vec).into());
+}
+```
+
+But the upside of this ugliness:
+
+```typescript
+const arr4 = [new Baz(), new Baz(), new Baz()];
+
+useExternVec(arr4); // <- all the Baz instances are cloned by the TryInto impl
+useExternVec(arr4); // <- succeeds a second time
+```
+
+That is pretty good DX. It would be nice if we could avoid cloning everything, though.
+
+## Non-solutions
+
+I've also investigated various approaches that involve putting the `Vec` inside some kind of wrapper type. For example:
+
+```rust
+#[wasm_bindgen]
+pub struct Handle(Vec<Baz>);
+
+#[wasm_bindgen]
+impl Handle {
+    #[wasm_bindgen(constructor)]
+    pub fn new(vec: Vec<Baz>) -> Self {
+        Self(vec)
+    }
+}
+
+#[wasm_bindgen(js_name = "useHandleVec")]
+pub fn use_handle_vec(vec: &Handle) {
+    console::log_1(&format!("Rust: use_handle_vec {:?}", vec.0).into());
+}
+```
+
+In one sense, this works great - we can pass a `Handle` into the function without losing ownership. But really it just moves the problem somewhere else.
+
+If you always keep your collection wrapped in the `Handle`, you lose all of the useful functionality that you get from a native JavaScript `Array`. You can extract the data into a JavaScript `Array`, but as soon as you want to make a new `Handle`, you face the exact same problem of invalidating your array contents by passing them into the `Handle` constructor.
+
+---
+
+If there's a better solution out there, I'd really like to hear about it. Let me know below!
