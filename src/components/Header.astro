@@ -1,24 +1,25 @@
 ---
-
+import { Lightswitch } from "@components/Lightswitch";
 ---
 
-<header class="bg-white">
-  <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+<header class="bg-white dark:bg-gray-900">
+  <div class="mx-auto flex max-w-7xl items-center justify-between p-4">
     <div class="flex items-center">
       <a href="/">
         <img
           src="/favicon.svg"
           alt="Favicon"
-          class="w-6 h-6 mr-2"
+          class="mr-2 h-6 w-6"
           title="Mysterious U+237C"
         />
       </a>
-      <h1 class="text-xl font-bold text-gray-900">
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white">
         <a href="/">Ross Gardiner</a>
       </h1>
     </div>
-    <nav class="flex items-center space-x-4 text-gray-700">
+    <nav class="flex items-center space-x-4 text-gray-700 dark:text-gray-300">
       <a href="/posts">Posts</a>
+      <Lightswitch client:only />
     </nav>
   </div>
 </header>

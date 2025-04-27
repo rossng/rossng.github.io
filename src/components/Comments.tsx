@@ -1,6 +1,29 @@
 import Giscus from "@giscus/react";
+import { useEffect, useState } from "react";
 
 export function Comments() {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setTheme(
+        document.documentElement.classList.contains("dark") ? "dark" : "light",
+      );
+    };
+
+    // Initial theme check
+    updateTheme();
+
+    // Create a MutationObserver to watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <Giscus
       id="comments"
@@ -13,7 +36,7 @@ export function Comments() {
       reactions-enabled="1"
       emit-metadata="0"
       input-position="bottom"
-      theme="light"
+      theme={theme}
       lang="en"
       loading="lazy"
     />

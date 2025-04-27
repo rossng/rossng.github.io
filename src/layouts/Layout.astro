@@ -48,15 +48,23 @@ const {
         link: [{ rel: "icon", href: "/favicon.ico" }],
       }}
     />
+    <script is:inline lang="javascript">
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+      );
+    </script>
   </head>
   <body
-    class="bg-gradient-to-r from-[#ff7e5f] to-[#feb47b] w-full min-h-screen bg-no-repeat bg-cover"
+    class="min-h-screen w-full bg-gradient-to-r from-[#ff7e5f] to-[#feb47b] bg-cover bg-no-repeat dark:from-[#663326] dark:to-[#402d1f]"
   >
     <Header />
     <MainContent>
       <slot />
     </MainContent>
-    <footer class="text-center text-xs mt-4 mb-4">
+    <footer class="mt-4 mb-4 text-center text-xs">
       <a
         href="https://github.com/rossng/rossng.github.io/blob/main/README.md"
         class="text-gray-500">&copy;</a
