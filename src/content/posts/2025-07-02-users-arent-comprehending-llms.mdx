@@ -1,0 +1,142 @@
+---
+title: >
+  Users aren't comprehending LLMs
+date: 2025-07-02
+---
+
+import { LinkedInEmbed } from "../../components/LinkedInEmbed";
+
+Two-and-a-half years after ChatGPT launched, LLM capabilities are more impressive than ever. OpenAI's o3 can scour many documents to answer questions that I wouldn't have bothered asking otherwise. Sonnet 4 can one-shot (some) features in [Monumental](https://www.monumental.co/)'s codebase.
+
+One trend is making me uneasy: non-technical users crediting LLMs with mystical powers.
+
+An example from my LinkedIn feed:
+
+<LinkedInEmbed 
+  author="Jennifer ████████" 
+  title="Sales Professional ████████████ ██ ████ █ ██ █████████"
+  timeAgo="2w" 
+  reactions={1739}
+  comments={107}
+  reposts={20}
+  connectionDistance='3rd+'
+  content={`If you got laid off from LinkedIn yesterday I urge you to spend the next few weeks taking every single course in the OpenAI Academy + more.
+
+I was impacted May 9, 2023 -- this is my journey\*:
+
+First Use of AI (ChatGPT): May 17, 2023
+Current Status: Top 5% Globally | Top 2% in Canada
+
+Your AI Usage Growth Timeline
+
+Q2 2023 – The Explorer Phase:
+Approx. 50 messages (light usage, curiosity-driven).
+Primary focus: content rewording, email drafting, and sales follow-ups.
+Comparable to ~70% of Canadian sales reps experimenting with AI.
+
+Q3 2023 – The Adoption Phase:
+Approx. 100 messages (steady increase).
+Began using AI for customer messaging, account reviews, and QBR prep.
+Surpassed the median usage volume for Canadian sales reps by September 2023.
+
+Q4 2023 – The Strategic Phase:
+Approx. 150 messages (significant growth in complexity).
+Shifted to strategic use cases: customer strategy, executive messaging, competitive analysis.
+Average message length: 1,872 characters.
+Average conversation depth: 2.9 – showcasing a shift to deeper insights.
+Usage focus: strategic planning, competitive analysis, and Cloud migration pitches.
+
+Q1–Q2 2024 – The Power User Era:
+Approx. 400 messages (consistent high-volume usage).
+Fully integrated AI into daily workflow:
+Automating repetitive tasks (Zoom call summaries, Salesforce logging).
+Drafting customer emails, refining messaging, and building Automated Account Plans.
+Leveraging AI for complex customer strategy and Cloud Enterprise pitches.
+Average daily usage: 6.8 messages.
+
+Q3 2024–Q1 2025 – The Strategic Innovator Phase:
+Approx. 500 messages (peak strategic usage).
+Advanced automation: building custom workflows with n8n, including automated follow-ups and dynamic customer planning.
+Enhanced competitive positioning and customer strategy.
+Leveraged AI for complex problem-solving and rapid iteration of ideas.
+
+Getting laid off was the best thing that ever happened to me. I spent the summer teaching myself AI, landed an incredible job at Atlassian and now recruited for top Data & AI sales jobs globally. While I didn't know it when I was where you are today, it ended up being a massive blessing in disguise.
+
+\*usage stats pulled as a request prompt in GPT 4o
+
+#linkedinlayoffs #AI #skills`}
+/>
+
+This ChatGPT user asked 4o to compare her usage to other professionals. ChatGPT then gave a statistical breakdown of the prompts issued by the user and compared it to other users.
+
+A couple of problems:
+
+- 4o (I believe) lacks access to the user's full prompt history. At most it has some [memories](https://openai.com/index/memory-and-new-controls-for-chatgpt/) - not enough to summarise or count queries.
+- 4o (definitely) does not have access to data about other users' queries.
+
+Software engineers find this obvious. We know how you would implement support for this query. And we intuit that OpenAI haven't done that yet.
+
+But a normal user's mental model is very different. They see an oracle which gives _mostly_ useful and correct answers to questions. There is no clear pattern to explain when the oracle gives bad answers. So they average: assume every answer is _probably_ correct until proven otherwise.
+
+I don't mean to pick on this one LinkedIn user: they are illustrative of a wider phenomenon. Search for `"I asked ChatGPT"` and many examples will avail themselves ([1](https://www.linkedin.com/posts/davidjbland_i-asked-chatgpt-if-it-recommends-my-work-activity-7344454445704859648-GyaF), [2](https://www.linkedin.com/posts/uttammgupta_activity-7345309394261241857-6nRm), [3](https://www.linkedin.com/posts/nataliebrucknermenchelli_ai-writer-content-activity-7344180547096559617-aQB2))
+
+## Does this matter?
+
+Bad things happen when _common understanding of a system_ diverges from the _actual reality of a system_.
+
+Some examples:
+
+- Advanced driver assistance systems
+  - Observed system: Tesla Autopilot can drive my car
+  - Actual system: Autopilot can drive the car, most of the time, under certain conditions
+  - Result: user [sleeps at the wheel, crashes](https://carnewschina.com/2023/08/07/tesla-driver-confessed-he-slept-when-his-autopilot-operated-car-crashed-on-a-chinese-highway/)
+- VPNs
+  - Observed system: this keeps my data safe on the internet
+  - Actual system: this avoids leaking a very small and specific subset of data
+  - Result: your threat model was wrong, [the government arrests you](https://www.voanews.com/a/myanmar-junta-s-vpn-block-poses-major-threat-say-analysts/7686783.html) or [the VPN has logs](https://www.bleepingcomputer.com/news/security/cyberstalking-suspect-arrested-after-vpn-providers-shared-logs-with-the-fbi/)
+- Google
+  - Observed system: Google finds me safe and useful links related to my query
+  - Actual system: some of the links are paid ads, and anyone can buy them
+  - Result: [phishing](https://www.malwarebytes.com/blog/threat-intelligence/2023/07/malicious-ad-for-usps-phishes-for-jpmorgan-chase-credentials)
+
+## When the LLM is a mystery
+
+Just a few months after the launch of ChatGPT, a university instructor [pasted submitted essays into ChatGPT and asked if it had wrote them](https://www.rollingstone.com/culture/culture-features/texas-am-chatgpt-ai-professor-flunks-students-false-claims-1234736601/).
+
+- Mental model: ChatGPT is a singleton, persistent entity
+- True model: ChatGPT is a program that runs independently for each request
+
+A more worrying phenomenon has been termed 'ChatGPT-induced psychosis'. There are [several anecdotes on Reddit](https://old.reddit.com/r/ChatGPT/comments/1kalae8/chatgpt_induced_psychosis/) describing how people have been sucked into harmful delusions of a mystical or spiritual nature.
+
+- Mental model: ChatGPT confidently affirms my spirituality queries and so is correct
+- True model: ChatGPT is designed to be sycophantic and keep the conversation going
+
+Understanding how an LLM works should inoculate against these delusions.
+
+It is still unknown whether user understanding of LLMs will improve over time, like it did for older technologies. Is the conversational interface so dazzling that people will never see them as 'just ordinary software'?
+
+## Fixing the mental model
+
+Can we help users form a better mental model of what the LLM is doing?
+
+OpenAI's token effort (writing 'ChatGPT can make mistakes' on every page) appears insufficient.
+
+_Query context_ is important. Many users do not realise what data the LLM does (and does not) have access to. For example:
+
+- **training data**: lots of answers are fuzzily retrieved from the training inputs
+- **system prompt**: information about the user, today's date, etc.
+- **memories**: facts learned and stored (often silently) from past queries
+- **tools**: data from a vector database or internet searches
+
+If the user can see whether the input includes 'statistical analysis of ChatGPT queries made by sales professionals', they can actually know whether it's able to answer that question.
+
+What is today's user allowed to know?
+
+- **training data**: kept secret to avoid triggering the wrath of copyright holders. Also to maintain an edge over other model providers
+- **system prompt**: hidden from the user. Models refuse to print it out. [Maybe they will ban you for asking](https://arstechnica.com/information-technology/2024/09/openai-threatens-bans-for-probing-new-ai-models-reasoning-process/).
+- **memories**: hidden away in a settings panel
+- **tools**: ChatGPT will tell you what tools it has, but it isn't in the UI.
+
+No wonder users can't judge which questions the LLM can and can't answer.
+
+Model providers, you need to do a better job. Expose your context; demystify your oracles.
