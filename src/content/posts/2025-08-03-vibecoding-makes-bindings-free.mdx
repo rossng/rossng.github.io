@@ -1,0 +1,72 @@
+---
+title: >
+  Vibecoding makes bindings free?
+date: 2025-08-03
+---
+
+import { Image } from "astro:assets";
+import apriltags from "@assets/posts/2025-08-03-vibecoding-makes-bindings-free/apriltags.jpg";
+import coreimage from "@assets/posts/2025-08-03-vibecoding-makes-bindings-free/coreimage-raw-convert.jpg";
+
+From time to time, I encounter a problem sufficiently fiddly that I can't justify writing my own solution. But good news! There is a mature library with exactly the right features.
+
+Written in the wrong language.
+
+Drat.
+
+Now I have to make that decision again:
+
+- **Turn it into a service**. That means:
+  - designing some API
+  - finding and learning an RPC library in the library's language
+  - figuring out how to deploy it
+- **Shell out to it**. That means:
+  - adding layers of (de)serialisation
+  - figuring out how to bundle the executable with my application
+- **Write bindings**. That means:
+  - relearning how to use the binding generator or library
+  - writing a stack of boilerplate
+  - probably fighting with the C++ compiler
+
+Having bindings is often the nicest solution. If only it were less annoying to implement.
+
+## The challenge at hand
+
+I've been working on some vision-related things recently and I wanted to detect AprilTags in images in my Node.js application.
+
+<figure>
+  <Image src={apriltags} alt="Some AprilTags being used in robotics." />
+  <figcaption className="text-center text-xs">
+    [CC BY-SA 2.0 NASA/Frank
+    Michaux](https://www.flickr.com/photos/nasakennedy/41700441281)
+  </figcaption>
+</figure>
+
+There is a solid AprilTag library out there already. _The_ [AprilTag library](https://github.com/AprilRobotics/apriltag), really. But there's no package for it on NPM.
+
+I've been using Claude Code (and Cursor) a lot recently. I observed that they are surprisingly good at wiring up some value that needs to be passed through many layers of an application. That sure sounds a lot like writing bindings.
+
+So I pointed Claude Code at the problem and it pretty much just churned out [`@monumental-works/apriltag-node`](https://github.com/terraform-industries/apriltag-node). I didn't have to think about the nitty-gritty of the build system. I didn't have to manually describe the shape of the API in three different places.
+
+Did it choose the best way to do things? Probably not. But I would actually much prefer to have a suboptimal _working_ library than spend an hour deciding between `node-gyp` and `cmake-js`. Vibecoding just deletes the analysis paralysis step from my workflow.
+
+## Doing it again
+
+The next problem came a week later. I needed a fast way to convert RAW images to JPEG. ImageMagick seemed pretty slow (and I didn't really want to bundle it with the application). I soon discovered that macOS has an accelerated native API for this called [Core Image](https://developer.apple.com/documentation/coreimage).
+
+I was enthused by my experience creating the `apriltag-node` library. So I just tried the same thing again. And it worked again. I've never written a line of Objective-C++ in my life, but apparently I can vibecode it just fine.
+
+Iterating on the library was also great. I gave it a link to the docs; it read them; it added support for all 15+ relevant configuration parameters. This would have been mind-numbingly boring manual work.
+
+Within a few hours [`coreimage-raw-convert`](https://github.com/rossng/coreimage-raw-convert) was ready for business. And it was trivially easy to add extras like an interactive demo and benchmarks.
+
+<figure>
+  <Image src={coreimage} alt="Interactive demo UI of coreimage-raw-convert." />
+  <figcaption className="text-center text-xs">
+    The vibecoded demo of coreimage-raw-convert
+  </figcaption>
+</figure>
+
+---
+
+I am excited to try this in a non-Node environment at some point. Hopefully this approach works equally well for writing Python and Rust bindings.
