@@ -1,0 +1,29 @@
+---
+title: >
+  Project: in-browser AprilTag detector
+date: 2025-08-03
+---
+
+import { Image } from "astro:assets";
+import detector from "@assets/posts/2025-08-03-apriltag-detector/apriltag-detector.jpg";
+
+I've been wanting to detect AprilTags using my Android phone for a while now. There's [an app](https://play.google.com/store/apps/details?id=edu.umich.eecs.april.apriltag&hl=en), but it doesn't support the tag families I want.
+
+Luckily someone had already done the hard work of convincing Emscripten to compile the AprilTag library to WASM (see [arenaxr/apriltag-js-standalone](https://github.com/arenaxr/apriltag-js-standalone)).
+
+So without further ado: here's [AprilTag Detector](https://www.rossng.eu/apriltag-mobile/), a way to detect AprilTags using just your web browser.
+
+Features:
+
+- Tag families: `tag36h11`, `tag25h9`, `tag16h5`, `tagStandard41h12`, `tagStandard52h13`, `tagCircle21h7`, `tagCircle49h12`, `tagCustom48h12`
+- Live detection using your device camera
+- Record all tags seen during a period of time (useful for surveying an area)
+- Upload an image from your device
+
+<figure>
+  <Image src={detector} alt="The AprilTag detector in action." />
+  <figcaption className="text-center text-xs">
+    Image [CC BY-SA 2.0 NASA/Frank
+    Michaux](https://www.flickr.com/photos/nasakennedy/41700441281)
+  </figcaption>
+</figure>
