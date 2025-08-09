@@ -1,0 +1,42 @@
+---
+title: >
+  Project: Where Should I aim?
+date: 2025-08-09
+---
+
+import { Image } from "astro:assets";
+import gif from "@assets/posts/2025-08-09-where-should-i-aim/demo.gif";
+
+I was playing darts a while ago and, not being very good, I spent a lot of time wondering where I should aim in order to maximise my expected score. Probably not at the triple 20, given how small it is (and how close it is to scoring one point). Where then? In the middle? Somewhere on the 19?
+
+Anyway, I then read about WebGPU and its support for compute shaders in the browser. It sounded like it might be fun to build the analysis on top of that.
+
+Without further ado:
+
+{
+
+<div className="flex flex-col items-center">
+  <a
+    href="https://rossng.eu/where-should-i-aim"
+    title="Try out 'Where Should I Aim?'"
+    target="_blank"
+    className="mx-auto rounded border-2 border-black bg-gradient-to-b from-[#ff7e5f] to-[#feb47b] p-5 text-2xl text-black no-underline hover:bg-gradient-to-b hover:from-[#feb47b] hover:to-[#ff7e5f]"
+  >
+    Where Should I Aim?
+  </a>
+</div>
+}
+
+<a href="https://rossng.eu/where-should-i-aim" target="_blank">
+  <Image src={gif} alt="A quick preview of the app" class="rounded shadow-lg" />
+</a>
+
+On GitHub: [rossng/where-should-i-aim](https://github.com/rossng/where-should-i-aim)
+
+---
+
+I then googled 'darts gaussian distribution' and found that this is not exactly a breakthrough in darts analysis technology. If you liked this, you might also enjoy looking at these:
+
+- [A Statistician Plays Darts](https://www.stat.cmu.edu/~ryantibs/papers/darts.pdf)
+- [A Statistican's Guide to Playing Darts](https://www.ttested.com/guide-to-darts/)
+- [Darts Strategy Optimizer](https://zmaciej.github.io/DartsStrategyOptimizer/) - this is a cool one!
