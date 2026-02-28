@@ -3,30 +3,30 @@
   "version": "0.0.44",
   "license": "MIT",
   "dependencies": {
-    "@astrojs/markdoc": "^0.15.0",
-    "@astrojs/mdx": "^4.3.0",
-    "@astrojs/react": "^4.3.0",
-    "@astrojs/rss": "^4.0.12",
-    "@astrojs/sitemap": "^3.4.1",
+    "@astrojs/markdoc": "^0.15.10",
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/rss": "^4.0.15",
+    "@astrojs/sitemap": "^3.7.0",
     "@giscus/react": "^3.1.0",
     "@iconify-json/mdi": "^1.2.3",
-    "@radix-ui/react-slot": "^1.2.0",
-    "@radix-ui/react-tooltip": "^1.2.4",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "astro": "^5.10.2",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^5.18.0",
     "astro-icon": "^1.1.5",
-    "astro-seo": "^0.8.4",
+    "astro-seo": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
-    "lucide-react": "^0.503.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "lucide-react": "^0.575.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-icons": "^5.5.0",
-    "tailwind-merge": "^3.2.0",
-    "tailwindcss": "^4.1.4",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.1",
     "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {
@@ -39,10 +39,10 @@
     "sync": "astro sync"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.4",
-    "prettier": "^3.5.3",
+    "@tailwindcss/vite": "^4.2.1",
+    "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.7.2"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "pnpm@10.30.3"
 }
