@@ -1,0 +1,66 @@
+---
+import "@styles/globals.css";
+import Layout from "../../layouts/Layout.astro";
+
+const apps = [
+  {
+    title: "AprilTag Mobile",
+    href: "https://www.rossng.eu/apriltag-mobile/",
+    description: "An AprilTag detector that runs entirely in your browser.",
+  },
+  {
+    title: "Merhaba",
+    href: "https://www.rossng.eu/merhaba/",
+    description: "Small interactive tools for learning Turkish.",
+  },
+  {
+    title: "Muural",
+    href: "https://www.rossng.eu/muural/",
+    description: "A toy for drawing brick walls in the browser.",
+  },
+  {
+    title: "oxmpl.js Demo",
+    href: "https://www.rossng.eu/oxmpl-js-demo/",
+    description:
+      "The oxmpl motion-planning library compiled to WebAssembly and running in the browser.",
+  },
+  {
+    title: "Pebble Watchfaces",
+    href: "https://www.rossng.eu/pebble-watchfaces/",
+    description: "A collection of my watchfaces for Pebble smartwatches.",
+  },
+  {
+    title: "Supermarket Size",
+    href: "https://www.rossng.eu/supermarket-size/",
+    description:
+      "A MapLibre map for exploring Dutch supermarkets by their BAG floor area.",
+  },
+  {
+    title: "Tinted Stream",
+    href: "https://tinted.stream/",
+    description: "Any solid colour, full screen, in your browser.",
+  },
+  {
+    title: "Where Should I Aim?",
+    href: "https://www.rossng.eu/where-should-i-aim/",
+    description:
+      "A WebGPU experiment exploring the optimal aiming position on a dartboard.",
+  },
+];
+---
+
+<Layout title="Apps">
+  <div class="prose">
+    <h1>Apps</h1>
+    <p>A few small things I've built that run in the browser.</p>
+    <ul>
+      {
+        apps.map((app) => (
+          <li>
+            <a href={app.href}>{app.title}</a> - {app.description}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Layout>
