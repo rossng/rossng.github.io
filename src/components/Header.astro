@@ -1,5 +1,5 @@
 ---
-import { Lightswitch } from "@components/Lightswitch";
+import Lightswitch from "@components/Lightswitch.astro";
 ---
 
 <header class="bg-white dark:bg-gray-900">
@@ -20,7 +20,7 @@ import { Lightswitch } from "@components/Lightswitch";
     <nav class="flex items-center space-x-4 text-gray-700 dark:text-gray-300">
       <a href="/posts">Posts</a>
       <a href="/apps">Apps</a>
-      <Lightswitch client:only />
+      <Lightswitch />
     </nav>
   </div>
 </header>
