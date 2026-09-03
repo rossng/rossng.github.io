@@ -1,6 +1,6 @@
 ---
 import "@styles/globals.css";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import PostMeta from "../../components/PostMeta.astro";
 
@@ -10,13 +10,13 @@ const normalizedSlug = slug.replace(/-draft$/, "");
 const post = await getEntry("posts", normalizedSlug);
 
 if (!post) throw new Error("No post found for this slug");
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 // Generate static pages
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
   return posts.map((post) => ({
-    params: { slug: post.data.draft ? `${post.slug}-draft` : post.slug },
+    params: { slug: post.data.draft ? `${post.id}-draft` : post.id },
   }));
 }
 import { Comments } from "@components/Comments";

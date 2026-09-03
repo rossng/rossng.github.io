@@ -19,7 +19,7 @@ const posts = await getCollection("posts");
           )
           .map((post) => (
             <li>
-              <a href={`/posts/${post.slug}`}>{post.data.title}</a> -{" "}
+              <a href={`/posts/${post.id}`}>{post.data.title}</a> -{" "}
               {new Date(post.data.date).toISOString().split("T")[0]}
             </li>
           ))
