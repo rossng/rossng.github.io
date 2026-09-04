@@ -109,6 +109,9 @@
   hr {
     @apply my-6 text-gray-200;
   }
+  [data-footnotes] {
+    @apply mt-6 border-t border-gray-200 pt-6;
+  }
   blockquote {
     @apply border-l-2 border-gray-200 pl-6 italic;
   }
