@@ -1,0 +1,80 @@
+---
+title: "On the current AI discourse"
+date: 2026-09-04
+---
+
+After seeing Rick Brewster being [attacked on Bluesky](https://bsky.app/profile/rickbrew.bsky.social/post/3muiv4pheo22g) for having the temerity to use AI to port his free software to run on Wine, I felt it was time to sit down and try to come up with a coherent viewpoint on the emerging rift between 'stop AI' and the rest of society.
+
+I don't think 'stop AI' is a particularly useful viewpoint. It's not realistic or actionable, and thus it won't satisfy the people advocating it either.
+
+As a software engineer, I believe that AI tooling is already obviously useful, and is not going anywhere. It also seems self-evident that it will slowly spider its way out to the wider economy, providing a significant boost to productivity.
+
+Some people are [intensely convinced](https://danluu.com/zitron/) that we are in a bubble, and that it will soon pop and take the entire AI industry with it. I don't think there's any chance of this. The market conditions may be a bubble, and we will likely see some spectacular failures, but the underlying technology is useful and people are paying for it. Bubbles have previously affected all sorts of real technologies from railways to telecommunications.[^1]
+
+Political opposition to AI has existed for some time: rationalist nerds worried about the end times, and the hard left worried that we're experiencing [steam-powered looms](https://en.wikipedia.org/wiki/Luddites) 2.0. But I've noticed recently that AI opposition/backlash seems to be turning into a much more mainstream movement. Out of left field, datacentre buildout appears to be the thing that's pulling previously uninterested people into the fold.
+
+# AI bad
+
+I do believe that AI is being used in a lot of stupid ways. For example:
+
+- to make bland, ugly AI art. I'm on holiday close to Antalya right now and it's sad to see all of the handmade signs being squeezed out by identical, soulless ChatGPT banners.
+- as an emotional plaything. I don't see that we're likely to have positive outcomes from people using AI as a substitute lover or to tell them that they are super-Jesus or whatever.
+- to enable scams, fraud and fake news. Clearly AI can supercharge the creation of fake news and personalised scams.
+
+But you can do all of this with model weights that can be downloaded from the internet right now. So no matter what we do, it's not going away.
+
+There's a second thread of concerns: will we accidentally destroy humanity?
+
+I don't feel qualified to answer this. At the same time, I'm pretty sure that nobody else is qualified to answer it either - though some of them certainly sound very confident while making proclamations in either direction.
+
+What I am fairly certain of is that trying to ban AI development through political activism is not going to work. The business opportunity is just too good. Ban it in the US? China will do it. Ban it there? The Gulf states will pick it up. And so on.
+
+Thanks to [the recent OpenAI/Hugging Face incident](https://openai.com/index/hugging-face-incident-and-the-road-ahead/), it is obvious that some of the loss of control risks have already arrived. That's an area where political pressure could be useful: we want to know that labs are taking reasonable steps to monitor and contain experiments; and there should be a kill switch available as a last resort.
+
+# Datacentres bad
+
+In a short period of time, we've seen a sudden swing from most people not giving a shit about datacentres to opposition becoming a [mainstream political movement](https://www.theguardian.com/us-news/ng-interactive/2026/aug/30/data-center-politics-democrats-republicans).
+
+Let's examine the main axes of opposition:
+
+- noise. I totally sympathise. Nobody should be subjected to this.
+- electricity use. A fair concern. We're talking about adding gigawatts of compute to the grid. If locals are directly exposed to a free energy market, they should be motivated to oppose it.
+- carbon emissions[^2]. We're looking at datacentres heading towards a double-digit percentage of electricity consumption in the US. If this is being powered by coal and gas, it's going to be pretty harmful.
+- water usage. As far as I can tell, this is primarily a concern when using evaporative cooling.
+- land use. Not ideal but, given humanity's ecologically destructive approach to farming and building new housing, it doesn't seem like anyone _really_ cares about this.
+
+I'm hesitant to paint people opposing datacentres in their local area as [NIMBYs](https://en.wikipedia.org/wiki/NIMBY). I think it's probably reasonable to be a little concerned about someone running a giant jet engine 24/7 in a field next to your house.
+
+But we've hit the point where new datacentres have started attracting activist attention even though they don't hit any of the above points. Even boring, multi-storey, non-AI datacentres, powered by green energy with closed-loop cooling are now in the crosshairs. I'm concerned that we're close to the point where people start trying to burn down critical infrastructure.
+
+The thing is that, looking at the list above, most things seem quite addressable - even for AI datacentres. We can, for example:
+
+- enforce acceptable limits on noise pollution. Datacentre builders will soon figure out how to reduce or redirect noise pollution
+- ensure datacentre builds are coupled with generation capacity, or at least insulate the consumer electricity market from their consumption
+- cap carbon emissions per MW, enforce building solar/wind/batteries - there are lots of mitigations that can be applied[^3]
+- prohibit evaporative cooling
+
+A lot of the wild west buildouts we're seeing right now seem to be a manifestation of US political structures.
+
+While many regions _are_ now imposing restrictions like the ones I just listed, the USA has an abundance of areas that identify as extremely libertarian and where politicians strongly favour maximum profitability for businesses.
+
+A lot of these are in empty, flat, cheap locations perfect for datacentre construction. Planning approval is fragmented and local, making it easy to find (or, not implausibly, pay off) a friendly jurisdiction. I doubt that there will be any significant intervention at a federal level.
+
+# Closing
+
+This creates an interesting conundrum for European nations. For [geopolitical reasons](https://europe2031.ai/), we need local AI datacentres. For the reasons above, I expect building datacentres in the US to remain very cheap for some time to come. But if we impose (fairly reasonable) restrictions to make these tolerable to local residents in Europe, they will be comparatively uneconomical.
+
+I don't have a solution for this. But we need to start thinking about it. The most obvious options:
+
+- mandate that some percentage of end users are served by local infrastructure
+- subsidise buildout
+
+I'd actually like to see more discourse on how we are going to address this. But frustatingly all the oxygen in the AI room is being sucked up by other things.
+
+As for the people harassing others for building cool stuff with AI, I'm now resolved that it's best to ignore them. There are some actually interesting (and solvable) political issues around AI and they have committed themselves to the least interesting solution: just say no to everything.
+
+[^1]: Contrast with nonsense sectors like crypto which have no real (legal) utility as of 2026.
+
+[^2]: I believe humanity can weather some warming through technological adaptation. We already are. And we can probably manage a bit more. But at some point we will hit the chaotic part of the curve, where small inputs have wildly outsized and unpredictable consequences. It is in our interest to avoid this, and the most reliable way to do so is to reduce greenhouse gas emissions as fast as reasonably possible.
+
+[^3]: Obviously these are complicated, but governments can model this if they want to.
