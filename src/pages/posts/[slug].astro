@@ -2,7 +2,6 @@
 import { getCollection, getEntry, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import Panel from "../../components/Panel.astro";
-import PostMeta from "../../components/PostMeta.astro";
 
 const { slug } = Astro.params;
 if (!slug) throw new Error("Slug not found");
@@ -25,10 +24,8 @@ import { Comments } from "@components/Comments";
 <Layout title={post.data.title}>
   <Panel>
     <a class="backlink" href="/posts">&larr; All posts</a>
-    <PostMeta
-      title={`${post.data.draft ? "DRAFT: " : ""} ${post.data.title}`}
-      date={post.data.date}
-    />
+    <h1>{post.data.draft && "DRAFT: "}{post.data.title}</h1>
+    <p class="post-date">{post.data.date.toISOString().split("T")[0]}</p>
     <Content />
     {
       !post.data.disableComments && !post.data.draft && (
