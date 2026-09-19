@@ -30,7 +30,9 @@ async function tileable(input, F) {
         const t = x / F; // 0 → wrapped pixel, 1 → own pixel
         const wrap = (y * W + L + x) * 4;
         for (let c = 0; c < 4; c++)
-          out[dst + c] = Math.round(data[wrap + c] * (1 - t) + data[src + c] * t);
+          out[dst + c] = Math.round(
+            data[wrap + c] * (1 - t) + data[src + c] * t,
+          );
       } else {
         out.set(data.subarray(src, src + 4), dst);
       }
@@ -90,7 +92,9 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
     .toBuffer();
   await emit(
     "base",
-    (await tileable(cropped, F)).resize({ width: Math.round((2172 - F) * s * DPR) }),
+    (await tileable(cropped, F)).resize({
+      width: Math.round((2172 - F) * s * DPR),
+    }),
     (2172 - F) * s,
     (724 - top) * s,
   );
@@ -107,25 +111,45 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   const waterH = H - quayH;
 
   const raw = async (pipeline) => {
-    const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const { data, info } = await pipeline
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     return { data, w: info.width, h: info.height };
   };
   // quay coping and wall (source rows 163..204), tileable, quayH tall
   const quaySrc = await sharp(`${SRC}/canal.png`)
     .extract({ left: 0, top: 163, width: 2172, height: 41 })
     .toBuffer();
-  const quay = await raw((await tileable(quaySrc, 100)).resize({ height: quayH }));
+  const quay = await raw(
+    (await tileable(quaySrc, 100)).resize({ height: quayH }),
+  );
   const W = quay.w;
   // pieces of the scene above the water, at widths that tile W exactly
   const wallSrc = await sharp(`${SRC}/canal.png`)
     .extract({ left: 0, top: 175, width: 2172, height: 28 })
     .toBuffer();
-  const wall = await raw((await tileable(wallSrc, 100)).resize({ width: W, height: Math.round(13 * SCALE) }).flip());
-  const base = await raw(sharp(`${OUT}/base.webp`).resize({ width: Math.round(W / 3) }).flip());
-  const brick = await raw(sharp(`${OUT}/brick.webp`).resize({ width: Math.round(W / 7) }).flip());
+  const wall = await raw(
+    (await tileable(wallSrc, 100))
+      .resize({ width: W, height: Math.round(13 * SCALE) })
+      .flip(),
+  );
+  const base = await raw(
+    sharp(`${OUT}/base.webp`)
+      .resize({ width: Math.round(W / 3) })
+      .flip(),
+  );
+  const brick = await raw(
+    sharp(`${OUT}/brick.webp`)
+      .resize({ width: Math.round(W / 7) })
+      .flip(),
+  );
 
-  // assemble the mirrored scene, W x waterH
+  // Two scenes: what stands above the water where the building is (quay
+  // wall, hedge, brick), and where only sky is (beside the bay on narrow
+  // viewports, where the wings are hidden).
   const scene = Buffer.alloc(W * waterH * 4);
+  const skyScene = Buffer.alloc(W * waterH * 4);
   const put = (piece, y0, rows) => {
     for (let y = 0; y < rows && y0 + y < waterH; y++)
       for (let x = 0; x < W; x++) {
@@ -140,43 +164,75 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   put(wall, 0, wall.h);
   put(base, wall.h, base.h);
   put(brick, wall.h + base.h, waterH);
+  scene.copy(skyScene, 0, 0, W * wall.h * 4);
+  const sky = [226, 204, 178];
+  for (let i = W * wall.h * 4; i < skyScene.length; i += 4) {
+    skyScene[i] = sky[0];
+    skyScene[i + 1] = sky[1];
+    skyScene[i + 2] = sky[2];
+    skyScene[i + 3] = 255;
+  }
 
   // ripple (horizontal displacement growing with depth), vertical smear, tint
   const water = [111, 112, 94]; // sampled from the painting
-  const out = Buffer.alloc(W * waterH * 4);
-  const px = (x, y) => (((y + waterH) % waterH) * W + ((x + W) % W)) * 4;
-  for (let y = 0; y < waterH; y++) {
-    const depth = y / waterH;
-    const dx = Math.round((2 + 5 * depth) * Math.sin(y / 3.1) + (1 + 3 * depth) * Math.sin(y / 7.7 + 1.3));
-    const smear = 1 + Math.round(3 * depth);
-    const t = 0.32 + 0.4 * depth; // how much water colour
-    const dark = 0.9 - 0.25 * depth;
-    for (let x = 0; x < W; x++) {
-      const acc = [0, 0, 0];
-      for (let k = -smear; k <= smear; k++) {
-        const i = px(x + dx, y + k);
-        acc[0] += scene[i];
-        acc[1] += scene[i + 1];
-        acc[2] += scene[i + 2];
+  const ripple = (scene) => {
+    const out = Buffer.alloc(W * waterH * 4);
+    const px = (x, y) => (((y + waterH) % waterH) * W + ((x + W) % W)) * 4;
+    for (let y = 0; y < waterH; y++) {
+      const depth = y / waterH;
+      const dx = Math.round(
+        (2 + 5 * depth) * Math.sin(y / 3.1) +
+          (1 + 3 * depth) * Math.sin(y / 7.7 + 1.3),
+      );
+      const smear = 1 + Math.round(3 * depth);
+      const t = 0.32 + 0.4 * depth; // how much water colour
+      const dark = 0.9 - 0.25 * depth;
+      for (let x = 0; x < W; x++) {
+        const acc = [0, 0, 0];
+        for (let k = -smear; k <= smear; k++) {
+          const i = px(x + dx, y + k);
+          acc[0] += scene[i];
+          acc[1] += scene[i + 1];
+          acc[2] += scene[i + 2];
+        }
+        const n = 2 * smear + 1;
+        const o = (y * W + x) * 4;
+        for (let c = 0; c < 3; c++)
+          out[o + c] = Math.round(
+            ((acc[c] / n) * (1 - t) + water[c] * t) * dark,
+          );
+        out[o + 3] = 255;
       }
-      const n = 2 * smear + 1;
-      const o = (y * W + x) * 4;
-      for (let c = 0; c < 3; c++)
-        out[o + c] = Math.round(((acc[c] / n) * (1 - t) + water[c] * t) * dark);
-      out[o + 3] = 255;
     }
+    return out;
+  };
+  const quayPng = await sharp(quay.data, {
+    raw: { width: W, height: quayH, channels: 4 },
+  })
+    .png()
+    .toBuffer();
+  for (const [name, sc] of [
+    ["canal", scene],
+    ["canal-sky", skyScene],
+  ]) {
+    const waterPng = await sharp(ripple(sc), {
+      raw: { width: W, height: waterH, channels: 4 },
+    })
+      .png()
+      .toBuffer();
+    await emit(
+      name,
+      sharp({
+        create: { width: W, height: H, channels: 4, background: "#000" },
+      }).composite([
+        { input: waterPng, top: quayH, left: 0 },
+        { input: quayPng, top: 0, left: 0 },
+      ]),
+      W / SCALE,
+      h,
+      80,
+    );
   }
-  const waterImg = sharp(out, { raw: { width: W, height: waterH, channels: 4 } });
-  await emit(
-    "canal",
-    sharp({ create: { width: W, height: H, channels: 4, background: "#000" } }).composite([
-      { input: await waterImg.png().toBuffer(), top: quayH, left: 0 },
-      { input: await sharp(quay.data, { raw: { width: W, height: quayH, channels: 4 } }).png().toBuffer(), top: 0, left: 0 },
-    ]),
-    W / SCALE,
-    h,
-    80,
-  );
 }
 
 // Parapet for the top of the bay: spans the bay width (840 CSS px), which
@@ -243,8 +299,12 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
 const vars = { course: COURSE, canal: `${CANAL_H}px` };
 for (const [name, [w, h]] of Object.entries(sizes)) {
   const m = await sharp(`${OUT}/${name}.webp`).metadata();
-  const kb = ((await sharp(`${OUT}/${name}.webp`).toBuffer()).length / 1024).toFixed(0);
-  console.log(`${name.padEnd(8)} ${m.width}x${m.height}px  ${kb} KB  display ${w.toFixed(1)}x${h.toFixed(1)}`);
+  const kb = (
+    (await sharp(`${OUT}/${name}.webp`).toBuffer()).length / 1024
+  ).toFixed(0);
+  console.log(
+    `${name.padEnd(8)} ${m.width}x${m.height}px  ${kb} KB  display ${w.toFixed(1)}x${h.toFixed(1)}`,
+  );
   vars[`${name}-w`] = `${w.toFixed(1)}px`;
   vars[`${name}-h`] = `${h.toFixed(1)}px`;
   vars[`${name}-aspect`] = (w / h).toFixed(4);
@@ -256,5 +316,7 @@ const css =
     .map(([k, v]) => `  --${k}: ${v};`)
     .join("\n") +
   "\n}\n";
-await import("node:fs/promises").then((fs) => fs.writeFile("src/styles/facade-sizes.css", css));
+await import("node:fs/promises").then((fs) =>
+  fs.writeFile("src/styles/facade-sizes.css", css),
+);
 console.log("wrote src/styles/facade-sizes.css");
