@@ -6,9 +6,9 @@
 // over whatever height the page happens to have.
 ---
 
-<div class="sky" aria-hidden="true"></div>
-<div class="skyline" aria-hidden="true"></div>
-<div class="wings" aria-hidden="true"></div>
+<div class="sky" aria-hidden="true" transition:persist></div>
+<div class="skyline" aria-hidden="true" transition:persist></div>
+<div class="wings" aria-hidden="true" transition:persist></div>
 
 <script is:inline>
   (() => {
@@ -52,97 +52,131 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    // One wing, drawn with its inner edge (next to the bay) at x = 0.
-    function wing(W, H, tag) {
-      const wallTop = CAP_Y + CAP_H - 44; // cap fades into the tile below
-      let s = `<g id="w${tag}">`;
-      s += `<rect y="${wallTop}" width="${W}" height="${H - wallTop}" fill="url(#brick)"/>`;
-      s += `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)"/>`;
-      s += `<rect y="${H - CANAL - BASE_H}" width="${W}" height="${BASE_H}" fill="url(#base)" mask="url(#fadeUp)"/>`;
-      // Quay pavement in front of the recessed wing, seen from above. The
-      // page's canal (whose quay edge is the pavement's front edge) slides
-      // over it, so the strip shrinks to nothing at the end of the scroll.
-      s += `<rect y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#quay)"/>`;
-      s += `<rect y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#joints)"/>`;
-      s += `</g>`;
+    const wallTop = CAP_Y + CAP_H - 44; // cap fades into the tile below
+    const rowTop = CAP_Y + CAP_H + 40;
+
+    // The height-independent part of one wing, drawn with its inner edge
+    // (next to the bay) at x = 0. layout() sets everything that depends on
+    // the page height, so a change of height never rebuilds the images.
+    const wingMarkup = (W, tag) =>
+      `<g id="w${tag}">` +
+      `<rect class="wall" y="${wallTop}" width="${W}" fill="url(#brick)"/>` +
+      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)"/>` +
+      // Base strip, then the quay pavement in front of the recessed wing,
+      // seen from above. The page's canal (whose quay edge is the pavement's
+      // front edge) slides over it at the end of the scroll.
+      `<g class="foot">` +
+      `<rect width="${W}" height="${BASE_H}" fill="url(#base)" mask="url(#fadeUp)"/>` +
+      `<rect y="${BASE_H}" width="${W}" height="${CANAL}" fill="url(#quay)"/>` +
+      `<rect y="${BASE_H}" width="${W}" height="${CANAL}" fill="url(#joints)"/>` +
+      `</g></g>` +
       // Night tint and the shadow cast by the bay, clipped to the wall's
       // silhouette (the parapet has sky between its steps).
-      s += `<mask id="m${tag}" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><use href="#w${tag}"/></mask>`;
-      s += `<rect width="${W}" height="${H}" fill="var(--brick-tint)" mask="url(#m${tag})"/>`;
-      s += `<rect width="${W}" height="${H}" fill="url(#shade)" mask="url(#m${tag})"/>`;
+      `<mask id="m${tag}" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}"><use href="#w${tag}"/></mask>` +
+      `<rect class="tall" width="${W}" fill="var(--brick-tint)" mask="url(#m${tag})"/>` +
+      `<rect class="tall" width="${W}" fill="url(#shade)" mask="url(#m${tag})"/>` +
+      `<g class="rows"></g>`;
 
-      // Storeys of windows: rows sit on a fixed pitch from the top, so the
-      // rows above the fold are in the same place on every page. Each slot
-      // is filled (or not), nudged, and lit by a seeded random draw, so the
-      // two wings differ and the facade is not symmetric.
-      const top = CAP_Y + CAP_H + 40;
-      const bottom = H - CANAL - BASE_H - 24;
-      const cols = [];
-      for (let x = 44; x + WIN_W + 24 <= W; x += WIN_W + 130) cols.push(x);
+    // One row of windows. Each slot is filled (or not), nudged, and lit by
+    // a seeded random draw, so the two wings differ and the facade is not
+    // symmetric. Rows sit on a fixed pitch from the top, so the rows above
+    // the fold are in the same place on every page.
+    const rowMarkup = (W, tag, i) => {
+      let s = `<g class="row">`;
       const wingSeed = tag === "L" ? 101 : 202;
-      for (let i = 0; top + i * STOREY + WIN_H <= bottom; i++) {
-        cols.forEach((cx, c) => {
-          const r = rnd(wingSeed + i * 31 + c * 7);
-          const present = (tag === "L" && i === 0 && c === 0) || r() < 0.5;
-          const y = Math.round(top + i * STOREY + (r() - 0.5) * 160);
-          const x = Math.round(cx + (r() - 0.5) * 24);
-          const lit = (0.15 + r() * 0.85).toFixed(2);
-          if (!present || y + WIN_H > bottom) return;
-          s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
-          s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
-        });
+      let c = 0;
+      for (let cx = 44; cx + WIN_W + 24 <= W; cx += WIN_W + 130, c++) {
+        const r = rnd(wingSeed + i * 31 + c * 7);
+        const present = (tag === "L" && i === 0 && c === 0) || r() < 0.5;
+        const y = Math.round(rowTop + i * STOREY + (r() - 0.5) * 160);
+        const x = Math.round(cx + (r() - 0.5) * 24);
+        const lit = (0.15 + r() * 0.85).toFixed(2);
+        if (!present) continue;
+        s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
+        s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
       }
-      return s;
+      return s + `</g>`;
+    };
+
+    let svg = null;
+    let builtW = 0;
+    let lastH = 0;
+
+    function layout(W, H) {
+      svg.setAttribute("width", W);
+      svg.setAttribute("height", H);
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      const bottom = H - CANAL - BASE_H - 24;
+      const nRows = Math.max(0, Math.floor((bottom - rowTop - WIN_H - 80) / STOREY) + 1);
+      for (const g of svg.querySelectorAll(".wing")) {
+        g.querySelector(".wall").setAttribute("height", H - wallTop);
+        g.querySelector(".foot").setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
+        g.querySelector("mask").setAttribute("height", H);
+        for (const r of g.querySelectorAll(".tall")) r.setAttribute("height", H);
+        const rows = g.querySelector(".rows");
+        while (rows.children.length > nRows) rows.lastElementChild.remove();
+        for (let i = rows.children.length; i < nRows; i++)
+          rows.insertAdjacentHTML("beforeend", rowMarkup(builtW, g.dataset.tag, i));
+      }
     }
 
     function build() {
       const W = Math.round(wings.clientWidth);
       const H = Math.round(wings.clientHeight);
-      const key = W + "x" + H;
-      if (wings.dataset.key === key) return;
-      wings.dataset.key = key;
       const wingW = Math.floor((W - Math.min(W, BAY_W)) / 2);
       if (wingW < 24 || H < 120) {
         wings.innerHTML = "";
+        svg = null;
         return;
       }
-      // Brick courses continue the cap's courses; the fade hides the bond.
-      const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
-      const fade = (id, from, to) =>
-        `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="${from}" stop-color="#fff"/><stop offset="${to}" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
-        `<mask id="${id}" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${id}g)"/></mask>`;
-      const image = (id, href, w, h, y) =>
-        `<pattern id="${id}" width="${w}" height="${h}" y="${y}" patternUnits="userSpaceOnUse"><image href="${href}" width="${w}" height="${h}"/></pattern>`;
-      wings.innerHTML =
-        `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>` +
-        image("brick", BRICK, TILE_W, TILE_H, patY) +
-        image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
-        image("base", BASE, BASE_W, BASE_H, H - CANAL - BASE_H) +
-        fade("fadeDown", 0.7, 1) +
-        fade("fadeUp", 0.35, 0) +
-        `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e4336"/><stop offset=".18" stop-color="#8d7d66"/><stop offset=".5" stop-color="#ada08a"/><stop offset="1" stop-color="#b8ab94"/></linearGradient>` +
-        `<pattern id="joints" width="46" height="16" patternUnits="userSpaceOnUse"><path d="M0 15.5H46M23 0V16" stroke="#000" stroke-opacity=".08"/></pattern>` +
-        `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +
-        `<radialGradient id="glow"><stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>` +
-        `</defs>` +
-        `<g transform="translate(${wingW} 0) scale(-1 1)">${wing(wingW, H, "L")}</g>` +
-        `<g transform="translate(${W - wingW} 0)">${wing(wingW, H, "R")}</g>` +
-        `</svg>`;
+      if (!svg || wingW !== builtW) {
+        // Brick courses continue the cap's courses; the fade hides the bond.
+        const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
+        const fade = (id, from, to) =>
+          `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="${from}" stop-color="#fff"/><stop offset="${to}" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+          `<mask id="${id}" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${id}g)"/></mask>`;
+        const image = (id, href, w, h, y) =>
+          `<pattern id="${id}" width="${w}" height="${h}" y="${y}" patternUnits="userSpaceOnUse"><image href="${href}" width="${w}" height="${h}"/></pattern>`;
+        wings.innerHTML =
+          `<svg xmlns="http://www.w3.org/2000/svg"><defs>` +
+          image("brick", BRICK, TILE_W, TILE_H, patY) +
+          image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
+          image("base", BASE, BASE_W, BASE_H, 0) +
+          fade("fadeDown", 0.7, 1) +
+          fade("fadeUp", 0.35, 0) +
+          `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e4336"/><stop offset=".18" stop-color="#8d7d66"/><stop offset=".5" stop-color="#ada08a"/><stop offset="1" stop-color="#b8ab94"/></linearGradient>` +
+          `<pattern id="joints" width="46" height="16" patternUnits="userSpaceOnUse"><path d="M0 15.5H46M23 0V16" stroke="#000" stroke-opacity=".08"/></pattern>` +
+          `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +
+          `<radialGradient id="glow"><stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>` +
+          `</defs>` +
+          `<g class="wing" data-tag="L" transform="translate(${wingW} 0) scale(-1 1)">${wingMarkup(wingW, "L")}</g>` +
+          `<g class="wing" data-tag="R" transform="translate(${W - wingW} 0)">${wingMarkup(wingW, "R")}</g>` +
+          `</svg>`;
+        svg = wings.firstElementChild;
+        builtW = wingW;
+        lastH = 0;
+      }
+      if (H !== lastH) layout(W, H);
+      lastH = H;
     }
 
-    let queued = false;
-    const rebuild = () => {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        build();
-      });
+    // Built synchronously: requestAnimationFrame does not fire in background
+    // tabs, and the wings must be right whenever the page is next seen.
+    const observer = new ResizeObserver(build);
+    const observe = () => {
+      observer.disconnect();
+      observer.observe(document.body);
+      build();
     };
-    rebuild();
-    new ResizeObserver(rebuild).observe(document.body);
-    addEventListener("resize", rebuild);
-    addEventListener("load", rebuild);
+    observe();
+    addEventListener("resize", build);
+    addEventListener("load", build);
+    // The client router replaces <body>; the persisted wings stay, but the
+    // new page has a new height.
+    document.addEventListener("astro:after-swap", observe);
+    document.addEventListener("astro:page-load", build);
+    // Background tabs get no resize notifications; catch up when shown.
+    document.addEventListener("visibilitychange", build);
 
     // Parallax fallback for browsers without scroll-driven animations.
     if (
@@ -203,6 +237,7 @@
   .wings {
     z-index: -1;
     --f: 0.15;
+    overflow: hidden;
   }
   .wings svg {
     display: block;
