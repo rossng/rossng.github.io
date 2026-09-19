@@ -150,20 +150,24 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   // viewports, where the wings are hidden).
   const scene = Buffer.alloc(W * waterH * 4);
   const skyScene = Buffer.alloc(W * waterH * 4);
-  const put = (piece, y0, rows) => {
+  const put = (piece, y0, rows, target = scene) => {
     for (let y = 0; y < rows && y0 + y < waterH; y++)
       for (let x = 0; x < W; x++) {
         const si = ((y % piece.h) * piece.w + (x % piece.w)) * 4;
         const di = ((y0 + y) * W + x) * 4;
-        scene[di] = piece.data[si];
-        scene[di + 1] = piece.data[si + 1];
-        scene[di + 2] = piece.data[si + 2];
-        scene[di + 3] = 255;
+        target[di] = piece.data[si];
+        target[di + 1] = piece.data[si + 1];
+        target[di + 2] = piece.data[si + 2];
+        target[di + 3] = 255;
       }
   };
   put(wall, 0, wall.h);
   put(base, wall.h, base.h);
   put(brick, wall.h + base.h, waterH);
+  // Under the recessed wings only the quay wall and brick show in the water.
+  const wingScene = Buffer.alloc(W * waterH * 4);
+  put(wall, 0, wall.h, wingScene);
+  put(brick, wall.h, waterH, wingScene);
   scene.copy(skyScene, 0, 0, W * wall.h * 4);
   const sky = [226, 204, 178];
   for (let i = W * wall.h * 4; i < skyScene.length; i += 4) {
@@ -214,6 +218,7 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   for (const [name, sc] of [
     ["canal", scene],
     ["canal-sky", skyScene],
+    ["canal-wings", wingScene],
   ]) {
     const waterPng = await sharp(ripple(sc), {
       raw: { width: W, height: waterH, channels: 4 },

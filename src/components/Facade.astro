@@ -71,8 +71,14 @@
       `<rect y="${BASE_H}" width="${W}" height="${CANAL}" fill="url(#joints)"/>` +
       `</g></g>` +
       // Night tint and the shadow cast by the bay, clipped to the wall's
-      // silhouette (the parapet has sky between its steps).
-      `<mask id="m${tag}" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}"><use href="#w${tag}"/></mask>` +
+      // silhouette (the parapet has sky between its steps). The mask repeats
+      // the silhouette with plain shapes: Chrome mis-renders a mask whose
+      // content is a <use> of a group containing masked elements.
+      `<mask id="m${tag}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}">` +
+      `<rect class="wall" y="${wallTop}" width="${W}" fill="#fff"/>` +
+      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#capAlpha)"/>` +
+      `<rect class="foot" width="${W}" height="${BASE_H + CANAL}" fill="#fff"/>` +
+      `</mask>` +
       `<rect class="tall" width="${W}" fill="var(--brick-tint)" mask="url(#m${tag})"/>` +
       `<rect class="tall" width="${W}" fill="url(#shade)" mask="url(#m${tag})"/>` +
       `<g class="rows"></g>`;
@@ -84,16 +90,17 @@
     const rowMarkup = (W, tag, i) => {
       let s = `<g class="row">`;
       const wingSeed = tag === "L" ? 101 : 202;
-      let c = 0;
-      for (let cx = 44; cx + WIN_W + 24 <= W; cx += WIN_W + 130, c++) {
-        const r = rnd(wingSeed + i * 31 + c * 7);
-        const present = (tag === "L" && i === 0 && c === 0) || r() < 0.5;
+      // One column of windows, centred in the wing.
+      if (W >= WIN_W + 48) {
+        const r = rnd(wingSeed + i * 31);
+        const present = (tag === "L" && i === 0) || r() < 0.6;
         const y = Math.round(rowTop + i * STOREY + (r() - 0.5) * 160);
-        const x = Math.round(cx + (r() - 0.5) * 24);
+        const x = Math.round((W - WIN_W) / 2 + (r() - 0.5) * 24);
         const lit = (0.15 + r() * 0.85).toFixed(2);
-        if (!present) continue;
-        s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
-        s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
+        if (present) {
+          s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
+          s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
+        }
       }
       return s + `</g>`;
     };
@@ -109,8 +116,8 @@
       const bottom = H - CANAL - BASE_H - 24;
       const nRows = Math.max(0, Math.floor((bottom - rowTop - WIN_H - 80) / STOREY) + 1);
       for (const g of svg.querySelectorAll(".wing")) {
-        g.querySelector(".wall").setAttribute("height", H - wallTop);
-        g.querySelector(".foot").setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
+        for (const r of g.querySelectorAll(".wall")) r.setAttribute("height", H - wallTop);
+        for (const f of g.querySelectorAll(".foot")) f.setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
         g.querySelector("mask").setAttribute("height", H);
         for (const r of g.querySelectorAll(".tall")) r.setAttribute("height", H);
         const rows = g.querySelector(".rows");
@@ -141,6 +148,7 @@
           `<svg xmlns="http://www.w3.org/2000/svg"><defs>` +
           image("brick", BRICK, TILE_W, TILE_H, patY) +
           image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
+        image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
           image("base", BASE, BASE_W, BASE_H, 0) +
           fade("fadeDown", 0.7, 1) +
           fade("fadeUp", 0.35, 0) +
@@ -219,6 +227,11 @@
     left: 0;
     right: 0;
     pointer-events: none;
+  }
+  /* The building has a maximum width; beyond it there is only sky. */
+  .wings {
+    left: max(0px, calc((100% - var(--building-w)) / 2));
+    right: max(0px, calc((100% - var(--building-w)) / 2));
   }
 
   /* Distant rooftops, seen above the wings' parapets. */
