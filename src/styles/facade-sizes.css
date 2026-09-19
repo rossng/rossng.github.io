@@ -29,6 +29,9 @@
   --plaque-w: 270.0px;
   --plaque-h: 94.2px;
   --plaque-aspect: 2.8670;
+  --edge-w: 32.0px;
+  --edge-h: 237.6px;
+  --edge-aspect: 0.1347;
   --skyline-w: 680.0px;
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
