@@ -485,14 +485,15 @@ body {
 
 /* ---------- header ---------- */
 
+/* Nameplate centred under the parapet's finial, menu centred beneath it. */
 .parapet {
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 34px 6px 14px;
+  gap: 0.9rem;
+  padding: 52px 6px 16px;
 }
 
 .plaque {
@@ -946,18 +947,6 @@ body {
   }
   .parapet {
     padding: 16px 2px 14px;
-    flex-wrap: wrap;
-  }
-  /* Once the nameplate and menu wrap onto two lines, centre both. */
-  @media (max-width: 600px) {
-    .parapet {
-      justify-content: center;
-      row-gap: 0.9rem;
-    }
-    .parapet .menu {
-      flex-basis: 100%;
-      justify-content: center;
-    }
   }
   .plaque {
     width: 220px;
