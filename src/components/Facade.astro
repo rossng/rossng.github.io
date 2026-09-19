@@ -160,8 +160,8 @@
           image("base", BASE, BASE_W, BASE_H, 0) +
           fade("fadeDown", 0.7, 1) +
           fade("fadeUp", 0.35, 0) +
-          `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e4336"/><stop offset=".18" stop-color="#8d7d66"/><stop offset=".5" stop-color="#ada08a"/><stop offset="1" stop-color="#b8ab94"/></linearGradient>` +
-          `<pattern id="joints" width="46" height="16" patternUnits="userSpaceOnUse"><path d="M0 15.5H46M23 0V16" stroke="#000" stroke-opacity=".08"/></pattern>` +
+          `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6350"/><stop offset=".06" stop-color="#a99c85"/><stop offset=".12" stop-color="#b8ac95"/><stop offset="1" stop-color="#c0b59e"/></linearGradient>` +
+          `<pattern id="joints" width="46" height="11" patternUnits="userSpaceOnUse"><path d="M0 10.5H46M23 0V11" stroke="#000" stroke-opacity=".07"/></pattern>` +
           `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +
           `<radialGradient id="glow"><stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>` +
           `</defs>` +
@@ -260,6 +260,9 @@
     background: var(--skyline) center -6px / var(--skyline-w) var(--skyline-h)
       repeat-x;
     opacity: 0.85;
+    /* Fade out towards the building's edges rather than stopping dead. */
+    -webkit-mask: linear-gradient(90deg, transparent, #000 160px, #000 calc(100% - 160px), transparent);
+    mask: linear-gradient(90deg, transparent, #000 160px, #000 calc(100% - 160px), transparent);
   }
   .dark .skyline {
     filter: brightness(0.3) saturate(0.6);
