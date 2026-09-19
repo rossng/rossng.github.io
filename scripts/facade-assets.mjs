@@ -284,6 +284,23 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   );
 }
 
+// Quoin strip for the building's outer edges: four block pairs between two
+// joints, so it tiles vertically; 32 CSS px wide. Flipped so the shadow
+// falls towards the brick when placed at the outer end of a wing.
+{
+  const w = 32;
+  const s = w / 203;
+  await emit(
+    "edge",
+    sharp(`${SRC}/edge.png`)
+      .extract({ left: 266, top: 302, width: 203, height: 1507 })
+      .flop()
+      .resize({ width: w * DPR }),
+    w,
+    1507 * s,
+  );
+}
+
 // Distant skyline: 150 CSS px tall, tileable.
 {
   const top = 278,
