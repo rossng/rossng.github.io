@@ -2,6 +2,7 @@
 import "@styles/globals.css";
 import Header from "../components/Header.astro";
 import Facade from "../components/Facade.astro";
+import { ClientRouter } from "astro:transitions";
 
 export interface Props {
   title: string;
@@ -37,6 +38,7 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
       href={new URL("feed.xml", Astro.site)}
     />
     <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
     <link rel="preload" as="image" href="/facade/brick.webp" />
     <link rel="preload" as="image" href="/facade/cap.webp" />
     <link rel="preload" as="image" href="/facade/window.webp" />
@@ -46,12 +48,24 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
     <meta property="og:url" content={Astro.url} />
     {description && <meta property="og:description" content={description} />}
     <script is:inline>
-      document.documentElement.classList.toggle(
-        "dark",
-        localStorage.theme === "dark" ||
-          (!("theme" in localStorage) &&
-            matchMedia("(prefers-color-scheme: dark)").matches)
+      const applyTheme = () =>
+        document.documentElement.classList.toggle(
+          "dark",
+          localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              matchMedia("(prefers-color-scheme: dark)").matches)
+        );
+      applyTheme();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          document.documentElement.classList.add("ready")
+        )
       );
+      // The client router swaps <html>'s attributes on navigation.
+      document.addEventListener("astro:after-swap", () => {
+        applyTheme();
+        document.documentElement.classList.add("ready");
+      });
       addEventListener("click", (e) => {
         if (!e.target.closest("#lightswitch")) return;
         const dark = document.documentElement.classList.toggle("dark");
