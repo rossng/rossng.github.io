@@ -10,6 +10,7 @@
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
   --bay-w: 840px;
+  --building-w: 1400px;
   --brick: url(/facade/brick.webp);
   --cap: url(/facade/cap.webp);
   --win: url(/facade/window.webp);
@@ -18,6 +19,7 @@
   --skyline: url(/facade/skyline.webp);
   --canal-img: url(/facade/canal.webp);
   --canal-sky: url(/facade/canal-sky.webp);
+  --canal-wings: url(/facade/canal-wings.webp);
   --baytop: url(/facade/baytop.webp);
   --water-tint: rgba(0, 0, 0, 0);
   --water-text: rgba(255, 248, 232, 0.85);
@@ -354,14 +356,42 @@ body {
 
 /* The canal the whole building stands beside: the quay and hedge reflected
    in the water, darkening with depth. */
+/* The building's reflection sits under the bay column, the recessed wings'
+   under the wings, and open sky beyond the building (or beside the bay
+   below 900px, where the wings are hidden). */
 .canal {
   position: relative;
   z-index: 1;
   height: var(--canal);
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
-    var(--canal-img) center top / auto 100% repeat-x;
+    var(--canal-sky) center top / auto 100% repeat-x;
   text-align: center;
+}
+.canal::before,
+.canal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.canal::before {
+  width: min(100%, var(--building-w));
+  background:
+    linear-gradient(var(--water-tint), var(--water-tint)),
+    var(--canal-wings) center top / auto 100% repeat-x;
+}
+.canal::after {
+  width: min(100%, var(--bay-w));
+  background:
+    linear-gradient(var(--water-tint), var(--water-tint)),
+    var(--canal-img) center top / auto 100% repeat-x;
+}
+.canal a {
+  z-index: 1;
 }
 .canal a {
   position: absolute;
@@ -727,7 +757,7 @@ body {
    widget with no comments (most posts) so the page does not jump, and ease
    any further growth. */
 .comments {
-  --comments-min: 340px;
+  --comments-min: 400px;
   min-height: var(--comments-min);
   margin-top: 3rem;
 }
@@ -835,17 +865,8 @@ body {
     padding-top: 22px;
   }
   /* No wings beside the bay here, so the water outside it reflects sky. */
-  .canal {
-    background:
-      linear-gradient(var(--water-tint), var(--water-tint)),
-      var(--canal-img) center top / auto 100% repeat-x,
-      var(--canal-sky) center top / auto 100% repeat-x;
-    background-size:
-      auto,
-      auto 100%,
-      auto 100%;
-    background-clip: border-box, content-box, border-box;
-    padding-inline: max(0px, calc((100% - var(--bay-w)) / 2));
+  .canal::before {
+    display: none;
   }
   .parapet {
     padding: 16px 2px 14px;
