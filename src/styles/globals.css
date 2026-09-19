@@ -77,8 +77,28 @@
   --water-text: rgba(236, 226, 205, 0.6);
 }
 
+/* Cross-document view transitions: the browser keeps the old page on screen
+   until the next one has rendered, then cross-fades, so the facade never
+   shows half-built between pages. Browsers without support navigate as
+   usual. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Theme colours are registered so the variables themselves animate when
-   the theme changes, carrying everything that uses them. */
+   the theme changes, carrying everything that uses them. The transition is
+   only enabled after first paint so it can never play on page load. */
 @property --water-tint {
   syntax: "<color>";
   inherits: true;
@@ -195,7 +215,7 @@
   initial-value: 0;
 }
 
-html {
+html.ready {
   transition: --water-tint 0.7s,
     --water-text 0.7s,
     --sky-top 0.7s,
@@ -802,6 +822,17 @@ body {
   .parapet {
     padding: 16px 2px 14px;
     flex-wrap: wrap;
+  }
+  /* Once the nameplate and menu wrap onto two lines, centre both. */
+  @media (max-width: 600px) {
+    .parapet {
+      justify-content: center;
+      row-gap: 0.9rem;
+    }
+    .parapet .menu {
+      flex-basis: 100%;
+      justify-content: center;
+    }
   }
   .plaque {
     width: 220px;
