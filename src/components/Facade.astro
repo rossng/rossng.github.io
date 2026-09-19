@@ -166,6 +166,13 @@
       }
       if (H !== lastH) layout(W, H);
       lastH = H;
+      // How far the wings still have to travel at the top of the page; the
+      // canal uses it to sink their reflection while they sit higher.
+      const f = parseFloat(getComputedStyle(wings).getPropertyValue("--f")) || 0;
+      document.documentElement.style.setProperty(
+        "--wing-travel",
+        `${(((H - innerHeight) * f) / (1 - f)).toFixed(1)}px`,
+      );
     }
 
     // Built synchronously: requestAnimationFrame does not fire in background
@@ -194,9 +201,12 @@
       const layers = [...document.querySelectorAll(".skyline, .wings")].map(
         (el) => [el, parseFloat(getComputedStyle(el).getPropertyValue("--f"))],
       );
+      const canal = document.querySelector(".canal");
       const update = () => {
         for (const [el, f] of layers)
           el.style.transform = `translateY(${(scrollY * f).toFixed(1)}px)`;
+        const max = scrollingElement.scrollHeight - innerHeight;
+        canal.style.setProperty("--reflect-shift", `${(max > 0 ? (1 - scrollY / max) : 0).toFixed(3)}`);
       };
       addEventListener("scroll", () => requestAnimationFrame(update), {
         passive: true,
@@ -229,6 +239,7 @@
     pointer-events: none;
   }
   /* The building has a maximum width; beyond it there is only sky. */
+  .skyline,
   .wings {
     left: max(0px, calc((100% - var(--building-w)) / 2));
     right: max(0px, calc((100% - var(--building-w)) / 2));
