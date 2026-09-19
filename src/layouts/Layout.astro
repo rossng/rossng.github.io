@@ -52,15 +52,18 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
         link: [{ rel: "icon", href: "/favicon.ico" }],
       }}
     />
-    <script is:inline lang="javascript">
+    <script is:inline>
       document.documentElement.classList.toggle(
         "dark",
-        location.hash === "#dark" ||
-          (location.hash !== "#light" &&
-            (localStorage.theme === "dark" ||
-              (!("theme" in localStorage) &&
-                window.matchMedia("(prefers-color-scheme: dark)").matches)))
+        localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            matchMedia("(prefers-color-scheme: dark)").matches)
       );
+      addEventListener("click", (e) => {
+        if (!e.target.closest("#lightswitch")) return;
+        const dark = document.documentElement.classList.toggle("dark");
+        localStorage.theme = dark ? "dark" : "light";
+      });
     </script>
   </head>
   <body>
@@ -77,10 +80,5 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
         >&copy; Ross Gardiner</a
       >
     </footer>
-    <script is:inline>
-      // Preview aid: open /#y=800 to load the page scrolled to 800px.
-      if (location.hash.startsWith("#y="))
-        addEventListener("load", () => scrollTo(0, +location.hash.slice(3)));
-    </script>
   </body>
 </html>

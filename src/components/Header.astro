@@ -22,10 +22,3 @@ import { Icon } from "astro-icon/components";
     </button>
   </nav>
 </header>
-
-<script is:inline>
-  document.getElementById("lightswitch").addEventListener("click", () => {
-    const dark = document.documentElement.classList.toggle("dark");
-    localStorage.theme = dark ? "dark" : "light";
-  });
-</script>
