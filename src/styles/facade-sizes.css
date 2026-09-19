@@ -32,9 +32,13 @@
   --edge-w: 32.0px;
   --edge-h: 237.6px;
   --edge-aspect: 0.1347;
+  --edge-reflection-w: 32.0px;
+  --edge-reflection-h: 237.6px;
+  --edge-reflection-aspect: 0.1347;
   --skyline-w: 680.0px;
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
   --cap-mortar: 129.1px;
+  --cap-coping: 56.1px;
   --baytop-coping: 0.3816;
 }

@@ -71,6 +71,7 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
     F = 120;
   const s = COURSE / ((700 - 456) / 5);
   extra["cap-mortar"] = `${(700 * s).toFixed(1)}px`; // lowest mortar line
+  extra["cap-coping"] = `${(304 * s).toFixed(1)}px`; // top of the plain coping
   const cropped = await sharp(`${SRC}/cap.png`)
     .extract({ left: x0, top: 0, width: L + F, height: 724 })
     .toBuffer();
@@ -298,6 +299,30 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
       .resize({ width: w * DPR }),
     w,
     1507 * s,
+  );
+}
+
+// The quoin strip as seen in the canal: mirrored, softened and tinted with
+// the water colour, keeping its transparency.
+{
+  const w = 32;
+  const strip = await sharp(`${SRC}/edge.png`)
+    .extract({ left: 266, top: 302, width: 203, height: 1507 })
+    .flop()
+    .flip()
+    .resize({ width: w * DPR })
+    .blur(0.8)
+    .modulate({ brightness: 0.8, saturation: 0.75 })
+    .png()
+    .toBuffer();
+  const { width, height } = await sharp(strip).metadata();
+  await emit(
+    "edge-reflection",
+    sharp(strip).composite([
+      { input: { create: { width, height, channels: 4, background: { r: 111, g: 112, b: 94, alpha: 0.45 } } }, blend: "atop" },
+    ]),
+    w,
+    (1507 * w) / 203,
   );
 }
 

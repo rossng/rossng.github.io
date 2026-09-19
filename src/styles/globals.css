@@ -18,6 +18,9 @@
   --plaque: url(/facade/plaque.webp);
   --skyline: url(/facade/skyline.webp);
   --edge: url(/facade/edge.webp);
+  --edge-reflection: url(/facade/edge-reflection.webp);
+  --quay-h: 20px;
+  --shade: 42, 15, 8;
   --canal-img: url(/facade/canal.webp);
   --canal-sky: url(/facade/canal-sky.webp);
   --canal-wings: url(/facade/canal-wings.webp);
@@ -386,11 +389,20 @@ body {
    remaining travel, driven by the same scroll timeline. */
 .canal::before {
   width: min(100%, var(--building-w));
+  --reflect-shift: 0;
+  --rs: calc(var(--wing-travel, 0px) * var(--reflect-shift));
+  --wing-w: calc((100% - var(--bay-w)) / 2);
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
-    var(--canal-wings) center top / auto 100% repeat-x;
-  --reflect-shift: 0;
-  background-position-y: calc(var(--wing-travel, 0px) * var(--reflect-shift));
+    /* the bay's shadow across the wings, mirrored */
+    linear-gradient(270deg, rgba(var(--shade), 0.45), rgba(var(--shade), 0.2) 8%, rgba(var(--shade), 0.08) 50%, rgba(var(--shade), 0.05))
+      left top / var(--wing-w) 100% no-repeat,
+    linear-gradient(90deg, rgba(var(--shade), 0.45), rgba(var(--shade), 0.2) 8%, rgba(var(--shade), 0.08) 50%, rgba(var(--shade), 0.05))
+      right top / var(--wing-w) 100% no-repeat,
+    /* the quoins, below the quay wall */
+    var(--edge-reflection) left calc(var(--quay-h) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
+    var(--edge-reflection) right calc(var(--quay-h) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
+    var(--canal-wings) center var(--rs) / auto 100% repeat-x;
 }
 @keyframes reflect {
   from {

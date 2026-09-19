@@ -42,6 +42,7 @@
     const EDGE_W = px("--edge-w", 32);
     const EDGE_H = px("--edge-h", 237.6);
     const EDGE = url("--edge");
+    const COPING = px("--cap-coping", 56);
     // Design constants
     const CAP_Y = 36; // sky shows above the parapet
     const STOREY = 780; // vertical pitch between window rows
@@ -66,7 +67,9 @@
       // The brick stops short of the corner so its cut ends hide under the
       // quoins, whose shorter blocks are set back a little.
       `<rect class="wall" y="${wallTop}" width="${W - 8}" fill="url(#brick)"/>` +
-      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)"/>` +
+      // The parapet, clipped at the corner to its plain coping line so the
+      // quoins can cap it whatever step of the parapet lands there.
+      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)" clip-path="url(#corner${tag})"/>` +
       // Base strip, then the quay pavement in front of the recessed wing,
       // seen from above. The page's canal (whose quay edge is the pavement's
       // front edge) slides over it at the end of the scroll.
@@ -77,7 +80,7 @@
       `</g>` +
       // Sandstone quoins down the building's outer edge, over the brick and
       // plinth, down to the pavement.
-      `<rect class="edge" x="${W - EDGE_W}" y="${CAP_Y + 18}" width="${EDGE_W}" fill="url(#edge${tag})"/>` +
+      `<rect class="edge" x="${W - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" fill="url(#edge${tag})"/>` +
       `</g>` +
       // Night tint and the shadow cast by the bay, clipped to the wall's
       // silhouette (the parapet has sky between its steps). The mask repeats
@@ -127,7 +130,7 @@
       for (const g of svg.querySelectorAll(".wing")) {
         for (const r of g.querySelectorAll(".wall")) r.setAttribute("height", H - wallTop);
         for (const f of g.querySelectorAll(".foot")) f.setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
-        g.querySelector(".edge").setAttribute("height", H - CANAL - CAP_Y - 18);
+        g.querySelector(".edge").setAttribute("height", H - CANAL - CAP_Y - COPING);
         g.querySelector("mask").setAttribute("height", H);
         for (const r of g.querySelectorAll(".tall")) r.setAttribute("height", H);
         const rows = g.querySelector(".rows");
@@ -168,8 +171,10 @@
           image("brick", BRICK, TILE_W, TILE_H, patY) +
           image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
         image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
-        `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + 18}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
-        `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + 18}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+        `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+        `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+        `<clipPath id="cornerL"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
+        `<clipPath id="cornerR"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
           image("base", BASE, BASE_W, BASE_H, 0) +
           fade("fadeDown", 0.7, 1) +
           fade("fadeUp", 0.35, 0) +
