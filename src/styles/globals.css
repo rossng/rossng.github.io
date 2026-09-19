@@ -19,7 +19,9 @@
   --skyline: url(/facade/skyline.webp);
   --edge: url(/facade/edge.webp);
   --edge-reflection: url(/facade/edge-reflection.webp);
-  --quay-h: 20px;
+  --quay-h: 20px; /* quay coping in the canal tile */
+  --quay-wall: 13px; /* its reflected face below the water line */
+  --corner-inset: 20px; /* the brick stops this short of the quoins */
   --shade: 42, 15, 8;
   --canal-img: url(/facade/canal.webp);
   --canal-sky: url(/facade/canal-sky.webp);
@@ -383,6 +385,10 @@ body {
    remaining travel, driven by the same scroll timeline. */
 .canal::before {
   width: min(100%, var(--building-w));
+  box-sizing: border-box;
+  /* The brick reflection is inset like the brick above it; the quoins sit
+     at the very edge, starting below the quay wall's reflection. */
+  padding-inline: var(--corner-inset);
   --reflect-shift: 0;
   --rs: calc(var(--wing-travel, 0px) * var(--reflect-shift));
   --wing-w: calc((100% - var(--bay-w)) / 2);
@@ -394,9 +400,11 @@ body {
     linear-gradient(90deg, rgba(var(--shade), 0.45), rgba(var(--shade), 0.2) 8%, rgba(var(--shade), 0.08) 50%, rgba(var(--shade), 0.05))
       right top / var(--wing-w) 100% no-repeat,
     /* the quoins, below the quay wall */
-    var(--edge-reflection) left calc(var(--quay-h) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
-    var(--edge-reflection) right calc(var(--quay-h) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
+    var(--edge-reflection) left calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
+    var(--edge-reflection) right calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
     var(--canal-wings) center var(--rs) / auto 100% repeat-x;
+  background-origin: border-box, content-box, content-box, border-box, border-box, content-box;
+  background-clip: border-box, content-box, content-box, border-box, border-box, content-box;
 }
 @keyframes reflect {
   from {
