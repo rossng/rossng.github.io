@@ -327,14 +327,8 @@ body {
   background:
     linear-gradient(var(--brick-tint), var(--brick-tint)),
     var(--baytop) center top / 100% 100% no-repeat;
-  -webkit-mask:
-    var(--baytop) center top / 100% 100% no-repeat,
-    linear-gradient(#000 72%, transparent);
-  -webkit-mask-composite: source-in;
-  mask:
-    var(--baytop) center top / 100% 100% no-repeat,
-    linear-gradient(#000 72%, transparent);
-  mask-composite: intersect;
+  -webkit-mask: var(--baytop) center top / 100% 100% no-repeat;
+  mask: var(--baytop) center top / 100% 100% no-repeat;
   pointer-events: none;
 }
 

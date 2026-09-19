@@ -21,8 +21,8 @@
   --canal-wings-h: 140.0px;
   --canal-wings-aspect: 7.2190;
   --baytop-w: 840.0px;
-  --baytop-h: 240.2px;
-  --baytop-aspect: 3.4976;
+  --baytop-h: 252.2px;
+  --baytop-aspect: 3.3313;
   --window-w: 104.0px;
   --window-h: 289.3px;
   --window-aspect: 0.3594;
@@ -39,6 +39,5 @@
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
   --cap-coping: 56.1px;
-  --cap-coping-h: 11.1px;
-  --baytop-coping: 0.3816;
+  --baytop-coping: 0.3834;
 }

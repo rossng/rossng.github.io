@@ -73,7 +73,6 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
     H = 456;
   const s = COURSE / 48.8; // brick course pitch in the painting
   extra["cap-coping"] = `${(304 * s).toFixed(1)}px`; // top of the plain coping
-  extra["cap-coping-h"] = `${(60 * s).toFixed(1)}px`; // coping stone thickness
   const cropped = await sharp(`${SRC}/cap.png`)
     .extract({ left: x0, top: 0, width: L + F, height: H })
     .toBuffer();
@@ -245,11 +244,12 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
 
 // Parapet for the top of the bay: spans the bay width (840 CSS px), which
 // happens to put its bricks at nearly the tile's scale. The bay's box starts
-// at the main coping line (source row 340).
+// just inside the plain coping (its top is source row 310, so the stone
+// always overlaps the brick); the finial begins at row 72.
 {
-  const top = 103,
+  const top = 72,
     w = 840;
-  extra["baytop-coping"] = ((340 - top) / (724 - top)).toFixed(4);
+  extra["baytop-coping"] = ((322 - top) / (724 - top)).toFixed(4);
   await emit(
     "baytop",
     sharp(`${SRC}/baytop.png`)
