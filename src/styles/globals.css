@@ -34,13 +34,11 @@
   --cream: #f6ead4;
 
   --plaster: #f4ead8;
-  --plaster-edge: #e6d8bf;
   --ink: #241c17;
   --ink-soft: #6a5a4d;
   --heading: #1f2434;
   --accent: #e0752c;
   --rule: rgba(150, 110, 70, 0.35);
-  --code-bg: #2a221e;
   --glass-glow: 0;
   --panel-sheen: rgba(255, 255, 255, 0.35);
   --panel-shade: rgba(50, 20, 10, 0.45);
@@ -49,11 +47,6 @@
   --tablet-glow: rgba(255, 255, 255, 0.45);
   --night: 0;
 
-  --radius: 0.625rem;
-  --background: var(--plaster);
-  --foreground: var(--ink);
-  --primary: var(--accent);
-  --border: var(--rule);
 }
 
 .dark {
@@ -68,13 +61,11 @@
   --cream: #e8d7bb;
 
   --plaster: #2e2721;
-  --plaster-edge: #221c17;
   --ink: #f3ebdd;
   --ink-soft: #c9bba6;
   --heading: #fbf1de;
   --accent: #f5944a;
   --rule: rgba(230, 200, 150, 0.26);
-  --code-bg: #15110f;
   --glass-glow: 1;
   --panel-sheen: rgba(255, 255, 255, 0.06);
   --panel-shade: rgba(0, 0, 0, 0.6);
@@ -84,10 +75,6 @@
   --night: 1;
   --water-tint: rgba(8, 12, 34, 0.62);
   --water-text: rgba(236, 226, 205, 0.6);
-}
-
-@theme {
-  --color-primary: #e0752c;
 }
 
 /* Theme colours are registered so the variables themselves animate when
@@ -147,11 +134,6 @@
   inherits: true;
   initial-value: #f4ead8;
 }
-@property --plaster-edge {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: #e6d8bf;
-}
 @property --ink {
   syntax: "<color>";
   inherits: true;
@@ -176,11 +158,6 @@
   syntax: "<color>";
   inherits: true;
   initial-value: rgba(150, 110, 70, 0.35);
-}
-@property --code-bg {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: #2a221e;
 }
 @property --panel-sheen {
   syntax: "<color>";
@@ -230,13 +207,11 @@ html {
     --stone-lo 0.7s,
     --cream 0.7s,
     --plaster 0.7s,
-    --plaster-edge 0.7s,
     --ink 0.7s,
     --ink-soft 0.7s,
     --heading 0.7s,
     --accent 0.7s,
     --rule 0.7s,
-    --code-bg 0.7s,
     --panel-sheen 0.7s,
     --panel-shade 0.7s,
     --panel-line 0.7s,
