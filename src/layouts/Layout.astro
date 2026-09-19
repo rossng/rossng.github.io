@@ -2,7 +2,6 @@
 import "@styles/globals.css";
 import Header from "../components/Header.astro";
 import Facade from "../components/Facade.astro";
-import { SEO } from "astro-seo";
 
 export interface Props {
   title: string;
@@ -24,7 +23,10 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="The personal site of Ross Gardiner" />
+    <meta
+      name="description"
+      content={description ?? "The personal site of Ross Gardiner"}
+    />
     <meta name="viewport" content="width=device-width" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -38,20 +40,11 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
     <link rel="preload" as="image" href="/facade/brick.webp" />
     <link rel="preload" as="image" href="/facade/cap.webp" />
     <link rel="preload" as="image" href="/facade/window.webp" />
-    <SEO
-      title={fullTitle}
-      description={description}
-      openGraph={{
-        basic: {
-          title: fullTitle,
-          type: ogType,
-          image: "",
-        },
-      }}
-      extend={{
-        link: [{ rel: "icon", href: "/favicon.ico" }],
-      }}
-    />
+    <title>{fullTitle}</title>
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={Astro.url} />
+    {description && <meta property="og:description" content={description} />}
     <script is:inline>
       document.documentElement.classList.toggle(
         "dark",
