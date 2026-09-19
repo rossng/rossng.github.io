@@ -229,14 +229,19 @@
   .skyline,
   .wings {
     height: calc((1 - var(--f)) * 100% + var(--f) * 100vh);
-    animation: lag linear both;
-    animation-timeline: scroll(root);
     will-change: transform;
   }
-  @supports not (animation-timeline: scroll()) {
+  /* Two rules with different selectors on purpose: the CSS minifier would
+     otherwise fold animation-timeline into the animation shorthand, which
+     browsers reject, silently disabling the parallax. */
+  @supports (animation-timeline: scroll()) {
     .skyline,
     .wings {
-      animation: none;
+      animation: lag linear both;
+    }
+    body .skyline,
+    body .wings {
+      animation-timeline: scroll(root);
     }
   }
   @media (prefers-reduced-motion: reduce) {
