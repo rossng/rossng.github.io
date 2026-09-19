@@ -1,6 +1,7 @@
 ---
+import "@styles/globals.css";
 import Header from "../components/Header.astro";
-import MainContent from "../components/MainContent.astro";
+import Facade from "../components/Facade.astro";
 import { SEO } from "astro-seo";
 
 export interface Props {
@@ -16,6 +17,7 @@ const {
   description,
   ogType = "website",
 } = Astro.props;
+const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
 ---
 
 <!doctype html>
@@ -33,13 +35,12 @@ const {
       href={new URL("feed.xml", Astro.site)}
     />
     <meta name="generator" content={Astro.generator} />
-    <title>{customTitle ? title : `${title} ⌁ Ross Gardiner`}</title>
     <SEO
-      title="A Very Descriptive Title"
+      title={fullTitle}
       description={description}
       openGraph={{
         basic: {
-          title: customTitle ? title : `${title} ⌁ Ross Gardiner`,
+          title: fullTitle,
           type: ogType,
           image: "",
         },
@@ -51,24 +52,32 @@ const {
     <script is:inline lang="javascript">
       document.documentElement.classList.toggle(
         "dark",
-        localStorage.theme === "dark" ||
-          (!("theme" in localStorage) &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        location.hash === "#dark" ||
+          (location.hash !== "#light" &&
+            (localStorage.theme === "dark" ||
+              (!("theme" in localStorage) &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)))
       );
     </script>
   </head>
-  <body
-    class="min-h-screen w-full bg-gradient-to-r from-[#ff7e5f] to-[#feb47b] bg-cover bg-no-repeat dark:from-[#663326] dark:to-[#402d1f]"
-  >
-    <Header />
-    <MainContent>
-      <slot />
-    </MainContent>
-    <footer class="mt-4 mb-4 text-center text-xs">
-      <a
-        href="https://github.com/rossng/rossng.github.io/blob/main/README.md"
-        class="text-gray-500">&copy;</a
+  <body>
+    <Facade />
+    <div class="bay">
+      <Header />
+      <main class="rooms">
+        <slot />
+      </main>
+      <div class="plinth"></div>
+    </div>
+    <footer class="canal">
+      <a href="https://github.com/rossng/rossng.github.io/blob/main/README.md"
+        >&copy; Ross Gardiner</a
       >
     </footer>
+    <script is:inline>
+      // Preview aid: open /#y=800 to load the page scrolled to 800px.
+      if (location.hash.startsWith("#y="))
+        addEventListener("load", () => scrollTo(0, +location.hash.slice(3)));
+    </script>
   </body>
 </html>

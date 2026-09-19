@@ -36,7 +36,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "tsc": "tsc",
-    "sync": "astro sync"
+    "sync": "astro sync",
+    "facade:assets": "node scripts/facade-assets.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

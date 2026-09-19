@@ -1,6 +1,6 @@
 ---
-import "@styles/globals.css";
 import Layout from "../../layouts/Layout.astro";
+import Panel from "../../components/Panel.astro";
 
 const apps = [
   {
@@ -55,17 +55,18 @@ const apps = [
 ---
 
 <Layout title="Apps">
-  <div class="prose">
+  <Panel>
     <h1>Apps</h1>
     <p>A few small things I've built that run in the browser.</p>
-    <ul>
+    <ul class="post-list">
       {
         apps.map((app) => (
           <li>
-            <a href={app.href}>{app.title}</a> - {app.description}
+            <a href={app.href}>{app.title}</a>
+            <span class="meta">{app.description}</span>
           </li>
         ))
       }
     </ul>
-  </div>
+  </Panel>
 </Layout>

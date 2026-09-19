@@ -3,120 +3,762 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
+    "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --bay-w: 840px;
+  --canal: 140px;
+  --brick: url(/facade/brick.webp);
+  --cap: url(/facade/cap.webp);
+  --win: url(/facade/window.webp);
+  --base: url(/facade/base.webp);
+  --plaque: url(/facade/plaque.webp);
+  --skyline: url(/facade/skyline.webp);
+  --canal-img: url(/facade/canal.webp);
+  --baytop: url(/facade/baytop.webp);
+  --water-tint: rgba(0, 0, 0, 0);
+  --water-text: rgba(255, 248, 232, 0.85);
+  --pilaster: 44px;
+  --panel-r: 30px;
+
+  --sky-top: #f1e4d2;
+  --sky-bottom: #dcc3a9;
+  --sky-glow: #fff6e2;
+
+  --brick-tint: rgba(0, 0, 0, 0);
+  --stone: #dfcba8;
+  --stone-hi: #ecdcbd;
+  --stone-lo: #b9995f;
+  --cream: #f6ead4;
+
+  --plaster: #f4ead8;
+  --plaster-edge: #e6d8bf;
+  --ink: #241c17;
+  --ink-soft: #6a5a4d;
+  --heading: #1f2434;
+  --accent: #e0752c;
+  --rule: rgba(150, 110, 70, 0.35);
+  --code-bg: #2a221e;
+  --glass-glow: 0;
+  --panel-sheen: rgba(255, 255, 255, 0.35);
+  --panel-shade: rgba(50, 20, 10, 0.45);
+  --panel-line: rgba(80, 40, 10, 0.12);
+  --tablet-ink: #1f2434;
+  --tablet-glow: rgba(255, 255, 255, 0.45);
+  --night: 0;
+
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.88 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: var(--plaster);
+  --foreground: var(--ink);
+  --primary: var(--accent);
+  --border: var(--rule);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.269 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.439 0 0);
+  --sky-top: #1a1930;
+  --sky-bottom: #3b2a38;
+  --sky-glow: #4a3a5a;
+
+  --brick-tint: rgba(18, 10, 32, 0.6);
+  --stone: #8e7a5c;
+  --stone-hi: #a89272;
+  --stone-lo: #5d4b33;
+  --cream: #e8d7bb;
+
+  --plaster: #2e2721;
+  --plaster-edge: #221c17;
+  --ink: #f3ebdd;
+  --ink-soft: #c9bba6;
+  --heading: #fbf1de;
+  --accent: #f5944a;
+  --rule: rgba(230, 200, 150, 0.26);
+  --code-bg: #15110f;
+  --glass-glow: 1;
+  --panel-sheen: rgba(255, 255, 255, 0.06);
+  --panel-shade: rgba(0, 0, 0, 0.6);
+  --panel-line: rgba(255, 255, 255, 0.05);
+  --tablet-ink: #1d1a26;
+  --tablet-glow: rgba(255, 255, 255, 0.25);
+  --night: 1;
+  --water-tint: rgba(8, 12, 34, 0.62);
+  --water-text: rgba(236, 226, 205, 0.6);
 }
 
 @theme {
-  --color-primary: #ff6600;
+  --color-primary: #e0752c;
 }
 
-@layer base {
-  h1 {
-    @apply my-4 text-2xl font-bold;
-  }
-  h2 {
-    @apply my-4 text-2xl font-bold;
-  }
-  h3 {
-    @apply my-4 text-xl font-bold;
-  }
-  p {
-    @apply my-4;
-  }
-  ul {
-    @apply marker:text-primary my-4 list-disc pl-6;
-  }
-  ol {
-    @apply my-4 list-decimal pl-6;
-  }
-  li {
-    @apply my-3 pl-2;
-  }
-  .prose a {
-    @apply font-semibold underline;
-  }
-  td {
-    @apply p-1;
-  }
-  pre {
-    @apply p-4;
-  }
-  hr {
-    @apply my-6 text-gray-200;
-  }
-  [data-footnotes] {
-    @apply mt-6 border-t border-gray-200 pt-6;
-  }
-  blockquote {
-    @apply border-l-2 border-gray-200 pl-6 italic;
-  }
+/* Theme colours are registered so the variables themselves animate when
+   the theme changes, carrying everything that uses them. */
+@property --water-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0);
+}
+@property --water-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 248, 232, 0.85);
+}
+@property --sky-top {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f1e4d2;
+}
+@property --sky-bottom {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #dcc3a9;
+}
+@property --sky-glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fff6e2;
+}
+@property --brick-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(0, 0, 0, 0);
+}
+@property --stone {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #dfcba8;
+}
+@property --stone-hi {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ecdcbd;
+}
+@property --stone-lo {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b9995f;
+}
+@property --cream {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f6ead4;
+}
+@property --plaster {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f4ead8;
+}
+@property --plaster-edge {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e6d8bf;
+}
+@property --ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #241c17;
+}
+@property --ink-soft {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #6a5a4d;
+}
+@property --heading {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f2434;
+}
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e0752c;
+}
+@property --rule {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(150, 110, 70, 0.35);
+}
+@property --code-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2a221e;
+}
+@property --panel-sheen {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.35);
+}
+@property --panel-shade {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(50, 20, 10, 0.45);
+}
+@property --panel-line {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(80, 40, 10, 0.12);
+}
+@property --tablet-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f2434;
+}
+@property --tablet-glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.45);
+}
+@property --glass-glow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --night {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
 
-  .dark {
-    @apply text-white;
+html {
+  transition: --water-tint 0.7s,
+    --water-text 0.7s,
+    --sky-top 0.7s,
+    --sky-bottom 0.7s,
+    --sky-glow 0.7s,
+    --brick-tint 0.7s,
+    --stone 0.7s,
+    --stone-hi 0.7s,
+    --stone-lo 0.7s,
+    --cream 0.7s,
+    --plaster 0.7s,
+    --plaster-edge 0.7s,
+    --ink 0.7s,
+    --ink-soft 0.7s,
+    --heading 0.7s,
+    --accent 0.7s,
+    --rule 0.7s,
+    --code-bg 0.7s,
+    --panel-sheen 0.7s,
+    --panel-shade 0.7s,
+    --panel-line 0.7s,
+    --tablet-ink 0.7s,
+    --tablet-glow 0.7s,
+    --glass-glow 0.7s,
+    --night 0.7s;
+}
+.dark .skyline,
+.skyline,
+.wing .win {
+  transition: filter 0.7s;
+}
+@media (prefers-reduced-motion: reduce) {
+  html,
+  .skyline,
+  .wing .win {
+    transition: none;
+  }
+}
+
+/* ---------- page scaffold ---------- */
+
+html {
+  background: var(--sky-bottom);
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  font-family: var(--serif);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+.dark body {
+  -webkit-font-smoothing: auto;
+}
+
+/* The central bay: a brick tower whose height is simply the content height. */
+.bay {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--bay-w));
+  /* Leave room above the box for the parapet's steps and finial: the box
+     itself begins at the main coping line, 38.3% down the parapet image. */
+  margin: calc(18px + min(100vw, var(--bay-w)) * 0.1095) auto 0;
+  padding: 0 var(--pilaster);
+  background:
+    linear-gradient(var(--brick-tint), var(--brick-tint)),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.22),
+      transparent 10%,
+      transparent 90%,
+      rgba(0, 0, 0, 0.22)
+    ),
+    var(--brick) center top / 152px 144px;
+  box-shadow:
+    0 0 0 1px rgba(40, 15, 5, 0.35),
+    0 0 48px 6px rgba(40, 12, 0, 0.5),
+    0 24px 70px rgba(40, 12, 0, 0.45);
+}
+.bay::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  aspect-ratio: 2172 / 621;
+  transform: translateY(-38.3%);
+  background:
+    linear-gradient(var(--brick-tint), var(--brick-tint)),
+    var(--baytop) center top / 100% 100% no-repeat;
+  -webkit-mask:
+    var(--baytop) center top / 100% 100% no-repeat,
+    linear-gradient(#000 72%, transparent);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--baytop) center top / 100% 100% no-repeat,
+    linear-gradient(#000 72%, transparent);
+  mask-composite: intersect;
+  pointer-events: none;
+}
+
+.rooms {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding-bottom: 36px;
+}
+
+.plinth {
+  margin: 0 calc(-1 * var(--pilaster));
+  height: 78px;
+  background:
+    linear-gradient(var(--brick-tint), var(--brick-tint)),
+    var(--base) center bottom / 403.7px 77.5px repeat-x;
+  -webkit-mask-image: linear-gradient(transparent, #000 35%);
+  mask-image: linear-gradient(transparent, #000 35%);
+}
+
+/* The canal the whole building stands beside: the quay and hedge reflected
+   in the water, darkening with depth. */
+.canal {
+  position: relative;
+  z-index: 1;
+  height: var(--canal);
+  background:
+    linear-gradient(var(--water-tint), var(--water-tint)),
+    var(--canal-img) center top / auto 100% repeat-x;
+  text-align: center;
+}
+.canal a {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  color: var(--water-text);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+.canal a:hover {
+  color: var(--cream);
+}
+
+/* ---------- header ---------- */
+
+.parapet {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 34px 6px 14px;
+}
+
+.plaque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 270px;
+  height: 94px;
+  padding: 8px 40px 2px 42px;
+  box-sizing: border-box;
+  background: var(--plaque) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 6px 10px rgba(30, 10, 0, 0.5))
+    brightness(calc(1 - var(--night) * 0.2));
+  color: #2b2418;
+  font-size: 1.3rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+}
+.plaque .glyph {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--accent);
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.4));
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.menu a {
+  padding: 0.3rem 0.95rem 0.35rem;
+  border-radius: 8px 16px 8px 16px;
+  background: linear-gradient(180deg, var(--stone-hi), var(--stone));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 0 var(--stone-lo),
+    0 8px 16px rgba(30, 10, 0, 0.4);
+  color: var(--tablet-ink);
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  text-shadow: 0 1px 0 var(--tablet-glow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.menu a:hover {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 var(--stone-lo),
+    0 4px 10px rgba(30, 10, 0, 0.4);
+}
+
+.lantern {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 2px solid #5a3d24;
+  background: radial-gradient(circle at 40% 35%, #f8dc98, #cf8f2f 70%, #9a6220);
+  box-shadow:
+    inset 0 -3px 5px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  color: #3a2410;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: box-shadow 0.3s;
+}
+.lantern svg {
+  grid-area: 1 / 1;
+  width: 1.25rem;
+  height: 1.25rem;
+  transition:
+    opacity 0.5s,
+    transform 0.5s;
+}
+.lantern .moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+.dark .lantern {
+  box-shadow:
+    inset 0 -3px 5px rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(255, 180, 80, 0.7);
+}
+.dark .lantern .sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+.dark .lantern .moon {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  position: relative;
+  padding: 30px 40px 34px;
+  border: 4px solid var(--stone);
+  border-radius: var(--panel-r) var(--panel-r) calc(var(--panel-r) * 1.6)
+    var(--panel-r);
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--panel-sheen), transparent 60%),
+    var(--plaster);
+  color: var(--ink);
+  box-shadow:
+    inset 0 10px 18px -8px var(--panel-shade),
+    inset 0 0 0 1px var(--panel-line),
+    0 2px 0 rgba(255, 255, 255, 0.12);
+  font-size: 1.06rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.panel:nth-child(even) {
+  border-radius: var(--panel-r) calc(var(--panel-r) * 1.6) var(--panel-r)
+    var(--panel-r);
+}
+
+.lede {
+  font-size: 1.7rem;
+  line-height: 1.3;
+  color: var(--heading);
+  margin: 0.2rem 0 1rem;
+}
+
+.socials {
+  display: flex;
+  gap: 1.4rem;
+  margin-top: 1.4rem;
+}
+.socials a {
+  color: var(--heading);
+  transition: color 0.15s;
+}
+.socials a:hover {
+  color: var(--accent);
+}
+.socials svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 0.6rem;
+}
+.section-title::after {
+  content: "";
+  width: 2.4rem;
+  height: 2px;
+  background: var(--accent);
+}
+
+.post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.panel .post-list li {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  margin: 0;
+  padding: 0.4rem 0 0.4rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+.post-list li:last-child {
+  border-bottom: 0;
+}
+.post-list li::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.95em;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.post-list a {
+  flex: 1;
+}
+.post-list time,
+.post-list .meta {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.post-list .meta {
+  white-space: normal;
+  flex: 2;
+}
+
+.backlink {
+  display: inline-block;
+  margin-bottom: 1.2rem;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--ink-soft);
+}
+.backlink:hover {
+  color: var(--accent);
+}
+
+.post-date {
+  margin: -0.6rem 0 1.4rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+/* ---------- prose ---------- */
+
+.panel h1,
+.panel h2,
+.panel h3,
+.panel h4 {
+  color: var(--heading);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+.panel h1 {
+  font-size: 2.3rem;
+  margin: 0.4rem 0 1rem;
+}
+.panel h2 {
+  font-size: 1.6rem;
+  margin: 1.8rem 0 0.7rem;
+}
+.panel h3 {
+  font-size: 1.25rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.panel p {
+  margin: 0.9rem 0;
+}
+.panel a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.panel a:hover {
+  color: var(--accent);
+}
+.panel ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0.9rem 0;
+}
+.panel ul::marker,
+.panel ul li::marker {
+  color: var(--accent);
+}
+.panel ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.9rem 0;
+}
+.panel li {
+  margin: 0.45rem 0;
+  padding-left: 0.3rem;
+}
+.panel img,
+.panel video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+.panel pre {
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.panel :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+  background: rgba(120, 80, 30, 0.12);
+}
+.panel blockquote {
+  margin: 1.2rem 0;
+  padding: 0.2rem 0 0.2rem 1.2rem;
+  border-left: 3px solid var(--accent);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.panel hr {
+  border: 0;
+  border-top: 1px solid var(--accent);
+  opacity: 0.6;
+  margin: 1.8rem 0;
+}
+.panel table {
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  width: 100%;
+}
+.panel th,
+.panel td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+.panel th {
+  color: var(--heading);
+}
+.panel sup a {
+  text-decoration: none;
+  color: var(--accent);
+}
+.panel .footnotes,
+.panel [data-footnotes] {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--accent);
+  font-size: 0.92rem;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 900px) {
+  :root {
+    --pilaster: 16px;
+    --panel-r: 20px;
+  }
+  .parapet {
+    padding-top: 22px;
+  }
+  .parapet {
+    padding: 16px 2px 14px;
+    flex-wrap: wrap;
+  }
+  .plaque {
+    width: 220px;
+    height: 77px;
+    padding: 6px 32px 2px 34px;
+    font-size: 1.05rem;
+  }
+  .menu {
+    gap: 1rem;
+  }
+  .panel {
+    padding: 20px 18px 24px;
+    border-width: 4px;
+  }
+  .lede {
+    font-size: 1.4rem;
+  }
+  .panel h1 {
+    font-size: 1.8rem;
+  }
+  .post-list li {
+    flex-wrap: wrap;
+    gap: 0 0.6rem;
+  }
+  .post-list a {
+    flex-basis: 100%;
   }
 }
