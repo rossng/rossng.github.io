@@ -1,4 +1,4 @@
-// Turns the painted source art in src/assets/facade/ into the small, tileable
+// Turns the painted source art in art/facade/ into the small, tileable
 // web assets the facade uses. Run with `npm run facade:assets` after replacing
 // any of the sources. Brick-bearing outputs are sized so that one brick
 // course is COURSE CSS pixels at 2x device pixel ratio. The display sizes
@@ -6,7 +6,7 @@
 // globals.css read, so the assets stay the single source of truth.
 import sharp from "sharp";
 
-const SRC = "src/assets/facade";
+const SRC = "art/facade";
 const OUT = "public/facade";
 const COURSE = 9; // CSS px per brick course
 const CANAL_H = 140; // CSS px, height of the canal band
