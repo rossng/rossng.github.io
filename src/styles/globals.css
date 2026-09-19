@@ -247,13 +247,13 @@ html {
 }
 .dark .skyline,
 .skyline,
-.wing .win {
+.wings .win {
   transition: filter 0.7s;
 }
 @media (prefers-reduced-motion: reduce) {
   html,
   .skyline,
-  .wing .win {
+  .wings .win {
     transition: none;
   }
 }

@@ -1,22 +1,19 @@
 ---
 // The parallax backdrop: sky, distant skyline and the two brick wings that
-// flank the central bay. The wings are assembled in the browser from painted
-// assets (brick tile, roofline cap, window unit, base strip; see
+// flank the central bay. The wings are one SVG assembled in the browser from
+// painted assets (brick tile, roofline cap, window unit, base strip; see
 // scripts/facade-assets.mjs) so that whole storeys of windows are distributed
 // over whatever height the page happens to have.
 ---
 
 <div class="sky" aria-hidden="true"></div>
 <div class="skyline" aria-hidden="true"></div>
-
-<div class="wing wing-l" aria-hidden="true"></div>
-<div class="wing wing-r" aria-hidden="true"></div>
+<div class="wings" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
 <script is:inline>
   (() => {
-    const wings = document.querySelectorAll(".wing");
-    if (!wings.length) return;
+    const wings = document.querySelector(".wings");
     const cs = getComputedStyle(document.documentElement);
     const url = (v) =>
       cs
@@ -24,11 +21,13 @@
         .trim()
         .replace(/^url\(["']?/, "")
         .replace(/["']?\)$/, "");
+    const px = (v, d) => parseFloat(cs.getPropertyValue(v)) || d;
     const BRICK = url("--brick");
     const CAP = url("--cap");
     const WIN = url("--win");
     const BASE = url("--base");
-    const CANAL = parseFloat(cs.getPropertyValue("--canal")) || 140;
+    const CANAL = px("--canal", 140);
+    const BAY_W = px("--bay-w", 840);
 
     // Display sizes of the assets. One brick course is COURSE px everywhere.
     const COURSE = 9;
@@ -53,51 +52,24 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    function build(wing, tag) {
-      const W = Math.round(wing.clientWidth);
-      const H = Math.round(wing.clientHeight);
-      const key = W + "x" + H;
-      if (wing.dataset.key === key) return;
-      wing.dataset.key = key;
-      if (W < 24 || H < 120) {
-        wing.innerHTML = "";
-        return;
-      }
-
-      // Brick courses continue the cap's courses; the cap's bottom edge fades
-      // into the tile so the bond does not have to line up exactly.
-      const wallTop = CAP_Y + CAP_H - 44;
-      const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
-
-      let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
-      s += `<defs>
-        <pattern id="${tag}b" width="${TILE_W}" height="${TILE_H}" y="${patY}" patternUnits="userSpaceOnUse"><image href="${BRICK}" width="${TILE_W}" height="${TILE_H}"/></pattern>
-        <pattern id="${tag}c" width="${CAP_W}" height="${CAP_H}" y="${CAP_Y}" patternUnits="userSpaceOnUse"><image href="${CAP}" width="${CAP_W}" height="${CAP_H}"/></pattern>
-        <linearGradient id="${tag}f" x1="0" y1="0" x2="0" y2="1"><stop offset=".7" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-        <mask id="${tag}fm" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${tag}f)"/></mask>
-        <pattern id="${tag}p" width="${BASE_W}" height="${BASE_H}" y="${H - CANAL - BASE_H}" patternUnits="userSpaceOnUse"><image href="${BASE}" width="${BASE_W}" height="${BASE_H}"/></pattern>
-        <linearGradient id="${tag}q" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e4336"/><stop offset=".18" stop-color="#8d7d66"/><stop offset=".5" stop-color="#ada08a"/><stop offset="1" stop-color="#b8ab94"/></linearGradient>
-        <pattern id="${tag}qj" width="46" height="16" patternUnits="userSpaceOnUse"><path d="M0 15.5H46M23 0V16" stroke="#000" stroke-opacity=".08" stroke-width="1"/></pattern>
-        <linearGradient id="${tag}pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".35" stop-color="#fff"/></linearGradient>
-        <mask id="${tag}pm" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${tag}pg)"/></mask>
-        <linearGradient id="${tag}s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>
-        <radialGradient id="${tag}g"><stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
-      </defs>`;
-      // the wall: tile below, painted parapet on top
-      s += `<g id="${tag}w">`;
-      s += `<rect x="0" y="${wallTop}" width="${W}" height="${H - wallTop}" fill="url(#${tag}b)"/>`;
-      s += `<rect x="0" y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#${tag}c)" mask="url(#${tag}fm)"/>`;
-      s += `<rect x="0" y="${H - CANAL - BASE_H}" width="${W}" height="${BASE_H}" fill="url(#${tag}p)" mask="url(#${tag}pm)"/>`;
+    // One wing, drawn with its inner edge (next to the bay) at x = 0.
+    function wing(W, H, tag) {
+      const wallTop = CAP_Y + CAP_H - 44; // cap fades into the tile below
+      let s = `<g id="w${tag}">`;
+      s += `<rect y="${wallTop}" width="${W}" height="${H - wallTop}" fill="url(#brick)"/>`;
+      s += `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)"/>`;
+      s += `<rect y="${H - CANAL - BASE_H}" width="${W}" height="${BASE_H}" fill="url(#base)" mask="url(#fadeUp)"/>`;
       // Quay pavement in front of the recessed wing, seen from above. The
       // page's canal (whose quay edge is the pavement's front edge) slides
       // over it, so the strip shrinks to nothing at the end of the scroll.
-      s += `<rect x="0" y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#${tag}q)"/>`;
-      s += `<rect x="0" y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#${tag}qj)"/>`;
+      s += `<rect y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#quay)"/>`;
+      s += `<rect y="${H - CANAL}" width="${W}" height="${CANAL}" fill="url(#joints)"/>`;
       s += `</g>`;
-      // night tint and the shadow cast by the bay, clipped to the wall's shape
-      s += `<mask id="${tag}m" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><use href="#${tag}w"/></mask>`;
-      s += `<rect width="${W}" height="${H}" fill="var(--brick-tint)" mask="url(#${tag}m)"/>`;
-      s += `<rect width="${W}" height="${H}" fill="url(#${tag}s)" mask="url(#${tag}m)"/>`;
+      // Night tint and the shadow cast by the bay, clipped to the wall's
+      // silhouette (the parapet has sky between its steps).
+      s += `<mask id="m${tag}" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><use href="#w${tag}"/></mask>`;
+      s += `<rect width="${W}" height="${H}" fill="var(--brick-tint)" mask="url(#m${tag})"/>`;
+      s += `<rect width="${W}" height="${H}" fill="url(#shade)" mask="url(#m${tag})"/>`;
 
       // Storeys of windows: rows sit on a fixed pitch from the top, so the
       // rows above the fold are in the same place on every page. Each slot
@@ -116,13 +88,46 @@
           const x = Math.round(cx + (r() - 0.5) * 24);
           const lit = (0.15 + r() * 0.85).toFixed(2);
           if (!present || y + WIN_H > bottom) return;
-          s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#${tag}g)"/>`;
+          s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
           s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
         });
       }
+      return s;
+    }
 
-      s += `</svg>`;
-      wing.innerHTML = s;
+    function build() {
+      const W = Math.round(wings.clientWidth);
+      const H = Math.round(wings.clientHeight);
+      const key = W + "x" + H;
+      if (wings.dataset.key === key) return;
+      wings.dataset.key = key;
+      const wingW = Math.floor((W - Math.min(W, BAY_W)) / 2);
+      if (wingW < 24 || H < 120) {
+        wings.innerHTML = "";
+        return;
+      }
+      // Brick courses continue the cap's courses; the fade hides the bond.
+      const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
+      const fade = (id, from, to) =>
+        `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="${from}" stop-color="#fff"/><stop offset="${to}" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+        `<mask id="${id}" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${id}g)"/></mask>`;
+      const image = (id, href, w, h, y) =>
+        `<pattern id="${id}" width="${w}" height="${h}" y="${y}" patternUnits="userSpaceOnUse"><image href="${href}" width="${w}" height="${h}"/></pattern>`;
+      wings.innerHTML =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>` +
+        image("brick", BRICK, TILE_W, TILE_H, patY) +
+        image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
+        image("base", BASE, BASE_W, BASE_H, H - CANAL - BASE_H) +
+        fade("fadeDown", 0.7, 1) +
+        fade("fadeUp", 0.35, 0) +
+        `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e4336"/><stop offset=".18" stop-color="#8d7d66"/><stop offset=".5" stop-color="#ada08a"/><stop offset="1" stop-color="#b8ab94"/></linearGradient>` +
+        `<pattern id="joints" width="46" height="16" patternUnits="userSpaceOnUse"><path d="M0 15.5H46M23 0V16" stroke="#000" stroke-opacity=".08"/></pattern>` +
+        `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +
+        `<radialGradient id="glow"><stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>` +
+        `</defs>` +
+        `<g transform="translate(${wingW} 0) scale(-1 1)">${wing(wingW, H, "L")}</g>` +
+        `<g transform="translate(${W - wingW} 0)">${wing(wingW, H, "R")}</g>` +
+        `</svg>`;
     }
 
     let queued = false;
@@ -131,7 +136,7 @@
       queued = true;
       requestAnimationFrame(() => {
         queued = false;
-        wings.forEach((w, i) => build(w, i ? "R" : "L"));
+        build();
       });
     };
     rebuild();
@@ -144,7 +149,7 @@
       !CSS.supports("animation-timeline: scroll()") &&
       !matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      const layers = [...document.querySelectorAll(".skyline, .wing")].map(
+      const layers = [...document.querySelectorAll(".skyline, .wings")].map(
         (el) => [el, parseFloat(getComputedStyle(el).getPropertyValue("--f"))],
       );
       const update = () => {
@@ -174,16 +179,16 @@
   }
 
   .skyline,
-  .wing {
+  .wings {
     position: absolute;
     top: 0;
+    left: 0;
+    right: 0;
     pointer-events: none;
   }
 
   /* Distant rooftops, seen above the wings' parapets. */
   .skyline {
-    left: 0;
-    right: 0;
     z-index: -2;
     --f: 0.4;
     background: var(--skyline) center -6px / 680px 150px repeat-x;
@@ -194,27 +199,17 @@
     opacity: 1;
   }
 
-  .wing {
+  .wings {
     z-index: -1;
-    width: max(0px, calc((100% - var(--bay-w)) / 2));
     --f: 0.15;
   }
-  .wing-l {
-    left: 0;
-  }
-  .wing-r {
-    right: 0;
-  }
-  .wing svg {
+  .wings svg {
     display: block;
   }
-  .wing-l svg {
-    transform: scaleX(-1);
-  }
-  .wing .glow {
+  .wings .glow {
     opacity: calc(var(--glass-glow) * var(--lit, 1));
   }
-  .dark .wing .win {
+  .dark .wings .win {
     filter: brightness(calc(0.45 + var(--lit, 1) * 0.85))
       saturate(calc(0.8 + var(--lit, 1) * 0.4));
   }
@@ -231,7 +226,7 @@
     }
   }
   .skyline,
-  .wing {
+  .wings {
     height: calc((1 - var(--f)) * 100% + var(--f) * 100vh);
     animation: lag linear both;
     animation-timeline: scroll(root);
@@ -239,20 +234,20 @@
   }
   @supports not (animation-timeline: scroll()) {
     .skyline,
-    .wing {
+    .wings {
       animation: none;
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .skyline,
-    .wing {
+    .wings {
       height: 100%;
       animation: none;
     }
   }
   @media (max-width: 900px) {
     .skyline,
-    .wing {
+    .wings {
       display: none;
     }
   }
