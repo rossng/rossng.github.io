@@ -6,8 +6,8 @@
   --brick-h: 144.0px;
   --brick-aspect: 1.0556;
   --cap-w: 346.7px;
-  --cap-h: 133.5px;
-  --cap-aspect: 2.5967;
+  --cap-h: 84.1px;
+  --cap-aspect: 4.1228;
   --base-w: 403.7px;
   --base-h: 77.5px;
   --base-aspect: 5.2081;
@@ -38,7 +38,7 @@
   --skyline-w: 680.0px;
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
-  --cap-mortar: 129.1px;
   --cap-coping: 56.1px;
+  --cap-coping-h: 11.1px;
   --baytop-coping: 0.3816;
 }
