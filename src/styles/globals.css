@@ -362,6 +362,8 @@ body {
 .canal {
   position: relative;
   z-index: 1;
+  width: min(100%, var(--building-w));
+  margin-inline: auto;
   height: var(--canal);
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
@@ -378,11 +380,42 @@ body {
   transform: translateX(-50%);
   pointer-events: none;
 }
+/* The wings lag the page, so while they sit higher than the bay their
+   reflection sits correspondingly deeper: the layer is offset by the wings'
+   remaining travel, driven by the same scroll timeline. */
 .canal::before {
   width: min(100%, var(--building-w));
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
     var(--canal-wings) center top / auto 100% repeat-x;
+  --reflect-shift: 0;
+  background-position-y: calc(var(--wing-travel, 0px) * var(--reflect-shift));
+}
+@keyframes reflect {
+  from {
+    --reflect-shift: 1;
+  }
+  to {
+    --reflect-shift: 0;
+  }
+}
+@property --reflect-shift {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@supports (animation-timeline: scroll()) {
+  .canal::before {
+    animation: reflect linear both;
+  }
+  body .canal::before {
+    animation-timeline: scroll(root);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .canal::before {
+    animation: none;
+  }
 }
 .canal::after {
   width: min(100%, var(--bay-w));
