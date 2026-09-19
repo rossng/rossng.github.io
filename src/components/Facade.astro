@@ -34,7 +34,8 @@
     const TILE_H = px("--brick-h", 144);
     const CAP_W = px("--cap-w", 346.7);
     const CAP_H = px("--cap-h", 133.5);
-    const CAP_MORTAR = px("--cap-mortar", 129.1);
+    const COPING_H = px("--cap-coping-h", 11);
+    const FADE_W = 120; // the parapet dissolves over this before each corner
     const WIN_W = px("--window-w", 104);
     const WIN_H = px("--window-h", 289.3);
     const BASE_W = px("--base-w", 403.7);
@@ -56,8 +57,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    const wallTop = CAP_Y + CAP_H - 44; // cap fades into the tile below
-    const rowTop = CAP_Y + CAP_H + 40;
+    const wallTop = CAP_Y + CAP_H; // the cap ends on a course; brick continues
+    const rowTop = 210; // first window row, below the parapet
 
     // The height-independent part of one wing, drawn with its inner edge
     // (next to the bay) at x = 0. layout() sets everything that depends on
@@ -67,9 +68,11 @@
       // The brick stops short of the corner so its cut ends hide under the
       // quoins, whose shorter blocks are set back a little.
       `<rect class="wall" y="${wallTop}" width="${W - 8}" fill="url(#brick)"/>` +
-      // The parapet, clipped at the corner to its plain coping line so the
-      // quoins can cap it whatever step of the parapet lands there.
-      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)" clip-path="url(#corner${tag})"/>` +
+      // A plain corner: coping stone and brick from the coping line down,
+      // which the stepped parapet dissolves into before the quoins.
+      `<rect x="${W - EDGE_W - FADE_W}" y="${CAP_Y + COPING}" width="${EDGE_W + FADE_W - 8}" height="${COPING_H}" fill="url(#stone)"/>` +
+      `<rect x="${W - EDGE_W - FADE_W}" y="${CAP_Y + COPING + COPING_H}" width="${EDGE_W + FADE_W - 8}" height="${wallTop - CAP_Y - COPING - COPING_H}" fill="url(#brick)"/>` +
+      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#capFade${tag})"/>` +
       // Base strip, then the quay pavement in front of the recessed wing,
       // seen from above. The page's canal (whose quay edge is the pavement's
       // front edge) slides over it at the end of the scroll.
@@ -88,7 +91,8 @@
       // content is a <use> of a group containing masked elements.
       `<mask id="m${tag}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}">` +
       `<rect class="wall" y="${wallTop}" width="${W}" fill="#fff"/>` +
-      `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#capAlpha)"/>` +
+      `<rect y="${CAP_Y}" width="${W - EDGE_W - FADE_W}" height="${CAP_H}" fill="url(#capAlpha)"/>` +
+      `<rect x="${W - EDGE_W - FADE_W}" y="${CAP_Y + COPING}" width="${EDGE_W + FADE_W}" height="${CAP_H - COPING}" fill="#fff"/>` +
       `<rect class="foot" width="${W}" height="${BASE_H + CANAL}" fill="#fff"/>` +
       `</mask>` +
       `<rect class="tall" width="${W}" fill="var(--brick-tint)" mask="url(#m${tag})"/>` +
@@ -151,7 +155,7 @@
       }
       if (!svg || wingW !== builtW) {
         // Brick courses continue the cap's courses; the fade hides the bond.
-        const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
+        const patY = ((CAP_Y + CAP_H) % COURSE).toFixed(1);
         // A vertical mask that is opaque at `solid` and transparent at `clear`
         // (fractions of the masked box), whichever is higher up.
         const fade = (id, solid, clear) => {
@@ -173,11 +177,12 @@
         image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
         `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
         `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
-        `<clipPath id="cornerL"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
-        `<clipPath id="cornerR"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
+        `<linearGradient id="capFadeG" gradientUnits="userSpaceOnUse" x1="${wingW - EDGE_W - FADE_W}" x2="${wingW - EDGE_W}" y1="0" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+        `<mask id="capFadeL" maskUnits="userSpaceOnUse" x="0" y="0" width="${wingW}" height="99999"><rect width="${wingW}" height="99999" fill="url(#capFadeG)"/></mask>` +
+        `<mask id="capFadeR" maskUnits="userSpaceOnUse" x="0" y="0" width="${wingW}" height="99999"><rect width="${wingW}" height="99999" fill="url(#capFadeG)"/></mask>` +
+        `<linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2d2b3"/><stop offset=".55" stop-color="#cdb890"/><stop offset="1" stop-color="#a8905f"/></linearGradient>` +
           image("base", BASE, BASE_W, BASE_H, 0) +
-          fade("fadeDown", 0.7, 1) +
-          fade("fadeUp", 0.35, 0) +
+            fade("fadeUp", 0.35, 0) +
           `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6350"/><stop offset=".06" stop-color="#a99c85"/><stop offset=".12" stop-color="#b8ac95"/><stop offset="1" stop-color="#c0b59e"/></linearGradient>` +
           `<pattern id="joints" width="46" height="11" patternUnits="userSpaceOnUse"><path d="M0 10.5H46M23 0V11" stroke="#000" stroke-opacity=".07"/></pattern>` +
           `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +

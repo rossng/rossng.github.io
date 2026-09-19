@@ -64,22 +64,24 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
 }
 
 // Roofline cap: a 1880px span starting and ending in a plain low section,
-// with the wrap-around seam cross-faded.
+// with the wrap-around seam cross-faded. The painting ends on a soldier
+// course, so the wall's brick continues from its bottom edge.
 {
   const x0 = 40,
     L = 1880,
-    F = 120;
-  const s = COURSE / ((700 - 456) / 5);
-  extra["cap-mortar"] = `${(700 * s).toFixed(1)}px`; // lowest mortar line
+    F = 120,
+    H = 456;
+  const s = COURSE / 48.8; // brick course pitch in the painting
   extra["cap-coping"] = `${(304 * s).toFixed(1)}px`; // top of the plain coping
+  extra["cap-coping-h"] = `${(60 * s).toFixed(1)}px`; // coping stone thickness
   const cropped = await sharp(`${SRC}/cap.png`)
-    .extract({ left: x0, top: 0, width: L + F, height: 724 })
+    .extract({ left: x0, top: 0, width: L + F, height: H })
     .toBuffer();
   await emit(
     "cap",
     (await tileable(cropped, F)).resize({ width: Math.round(L * s * DPR) }),
     L * s,
-    724 * s,
+    H * s,
   );
 }
 
