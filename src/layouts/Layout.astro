@@ -35,6 +35,9 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
       href={new URL("feed.xml", Astro.site)}
     />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preload" as="image" href="/facade/brick.webp" />
+    <link rel="preload" as="image" href="/facade/cap.webp" />
+    <link rel="preload" as="image" href="/facade/window.webp" />
     <SEO
       title={fullTitle}
       description={description}
