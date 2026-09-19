@@ -700,6 +700,95 @@ body {
   font-size: 0.92rem;
 }
 
+/* ---------- bean cards (That's not a lentil) ---------- */
+
+.bean-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin: 1.5rem 0;
+}
+.bean {
+  padding: 1.1rem 1.4rem 1.2rem;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+.bean-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem 1.6rem;
+  align-items: center;
+}
+.bean-forms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.bean-forms figure {
+  margin: 0;
+  text-align: center;
+}
+.bean-forms figcaption {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.bean-names h4 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+.bean-names p {
+  margin: 0.15rem 0 0;
+}
+.bean-latin {
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.bean-aka {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.bean-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.4rem;
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+}
+.bean-facts dt {
+  color: var(--heading);
+  font-weight: 600;
+}
+.bean-facts dd {
+  margin: 0;
+  color: var(--ink-soft);
+}
+.bean-facts small {
+  font-size: 0.82em;
+  opacity: 0.8;
+}
+.tip {
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  background: var(--heading);
+  color: var(--plaster);
+  font-size: 0.85rem;
+  font-family: var(--serif);
+}
+@media (max-width: 600px) {
+  .bean-head {
+    grid-template-columns: 1fr;
+  }
+  .bean-facts {
+    grid-template-columns: 1fr;
+    gap: 0.1rem 0;
+  }
+  .bean-facts dd {
+    margin-bottom: 0.6rem;
+  }
+}
+
 /* ---------- small screens ---------- */
 
 @media (max-width: 900px) {
