@@ -63,18 +63,22 @@
     // the page height, so a change of height never rebuilds the images.
     const wingMarkup = (W, tag) =>
       `<g id="w${tag}">` +
-      `<rect class="wall" y="${wallTop}" width="${W}" fill="url(#brick)"/>` +
+      // The brick stops short of the corner so its cut ends hide under the
+      // quoins, whose shorter blocks are set back a little.
+      `<rect class="wall" y="${wallTop}" width="${W - 8}" fill="url(#brick)"/>` +
       `<rect y="${CAP_Y}" width="${W}" height="${CAP_H}" fill="url(#cap)" mask="url(#fadeDown)"/>` +
-      // Sandstone quoins down the building's outer edge.
-      `<rect class="edge" x="${W - EDGE_W}" y="${CAP_Y + 18}" width="${EDGE_W}" fill="url(#edge${tag})"/>` +
       // Base strip, then the quay pavement in front of the recessed wing,
       // seen from above. The page's canal (whose quay edge is the pavement's
       // front edge) slides over it at the end of the scroll.
       `<g class="foot">` +
-      `<rect width="${W}" height="${BASE_H}" fill="url(#base)" mask="url(#fadeUp)"/>` +
+      `<rect width="${W - 8}" height="${BASE_H}" fill="url(#base)" mask="url(#fadeUp)"/>` +
       `<rect y="${BASE_H}" width="${W}" height="${CANAL}" fill="url(#quay)"/>` +
       `<rect y="${BASE_H}" width="${W}" height="${CANAL}" fill="url(#joints)"/>` +
-      `</g></g>` +
+      `</g>` +
+      // Sandstone quoins down the building's outer edge, over the brick and
+      // plinth, down to the pavement.
+      `<rect class="edge" x="${W - EDGE_W}" y="${CAP_Y + 18}" width="${EDGE_W}" fill="url(#edge${tag})"/>` +
+      `</g>` +
       // Night tint and the shadow cast by the bay, clipped to the wall's
       // silhouette (the parapet has sky between its steps). The mask repeats
       // the silhouette with plain shapes: Chrome mis-renders a mask whose
@@ -123,7 +127,7 @@
       for (const g of svg.querySelectorAll(".wing")) {
         for (const r of g.querySelectorAll(".wall")) r.setAttribute("height", H - wallTop);
         for (const f of g.querySelectorAll(".foot")) f.setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
-        g.querySelector(".edge").setAttribute("height", H - CANAL - BASE_H - CAP_Y - 18);
+        g.querySelector(".edge").setAttribute("height", H - CANAL - CAP_Y - 18);
         g.querySelector("mask").setAttribute("height", H);
         for (const r of g.querySelectorAll(".tall")) r.setAttribute("height", H);
         const rows = g.querySelector(".rows");
@@ -145,9 +149,18 @@
       if (!svg || wingW !== builtW) {
         // Brick courses continue the cap's courses; the fade hides the bond.
         const patY = ((CAP_Y + CAP_MORTAR) % COURSE).toFixed(1);
-        const fade = (id, from, to) =>
-          `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="${from}" stop-color="#fff"/><stop offset="${to}" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
-          `<mask id="${id}" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${id}g)"/></mask>`;
+        // A vertical mask that is opaque at `solid` and transparent at `clear`
+        // (fractions of the masked box), whichever is higher up.
+        const fade = (id, solid, clear) => {
+          const stops =
+            solid < clear
+              ? `<stop offset="${solid}" stop-color="#fff"/><stop offset="${clear}" stop-color="#fff" stop-opacity="0"/>`
+              : `<stop offset="${clear}" stop-color="#fff" stop-opacity="0"/><stop offset="${solid}" stop-color="#fff"/>`;
+          return (
+            `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1">${stops}</linearGradient>` +
+            `<mask id="${id}" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#${id}g)"/></mask>`
+          );
+        };
         const image = (id, href, w, h, y) =>
           `<pattern id="${id}" width="${w}" height="${h}" y="${y}" patternUnits="userSpaceOnUse"><image href="${href}" width="${w}" height="${h}"/></pattern>`;
         wings.innerHTML =
