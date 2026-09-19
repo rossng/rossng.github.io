@@ -132,3 +132,5 @@ dist
 .DS_Store
 
 .astro/
+# Ross keeps the previous versions of the facade paintings beside the live ones
+art/**/*-old.png
