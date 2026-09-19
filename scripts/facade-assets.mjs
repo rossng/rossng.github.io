@@ -295,7 +295,9 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
   const w = 32;
   await emit(
     "edge",
-    sharp(`${SRC}/edge.png`).extract(EDGE_CROP).resize({ width: w * DPR }),
+    sharp(`${SRC}/edge.png`)
+      .extract(EDGE_CROP)
+      .resize({ width: w * DPR }),
     w,
     (EDGE_CROP.height * w) / EDGE_CROP.width,
   );
@@ -317,7 +319,17 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
   await emit(
     "edge-reflection",
     sharp(strip).composite([
-      { input: { create: { width, height, channels: 4, background: { r: 111, g: 112, b: 94, alpha: 0.45 } } }, blend: "atop" },
+      {
+        input: {
+          create: {
+            width,
+            height,
+            channels: 4,
+            background: { r: 111, g: 112, b: 94, alpha: 0.45 },
+          },
+        },
+        blend: "atop",
+      },
     ]),
     w,
     (EDGE_CROP.height * w) / EDGE_CROP.width,
@@ -335,10 +347,15 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
     height = 217;
   const scale = (840 * 1.5) / 2172; // same pixel scale as the parapet
   extra["bay-pilaster-frac"] = (width / 2172).toFixed(4);
-  for (const [name, left] of [["bay-pilaster-l", 0], ["bay-pilaster-r", 2172 - width]]) {
+  for (const [name, left] of [
+    ["bay-pilaster-l", 0],
+    ["bay-pilaster-r", 2172 - width],
+  ]) {
     await emit(
       name,
-      sharp(`${SRC}/baytop.png`).extract({ left, top, width, height }).resize({ width: Math.round(width * scale) }),
+      sharp(`${SRC}/baytop.png`)
+        .extract({ left, top, width, height })
+        .resize({ width: Math.round(width * scale) }),
       (width * 840) / 2172,
       (height * 840) / 2172,
       76,

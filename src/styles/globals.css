@@ -7,7 +7,8 @@
   --serif:
     "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
     "Times New Roman", serif;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --mono:
+    ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
   --bay-w: 840px;
   --building-w: 1400px;
@@ -57,7 +58,6 @@
   --tablet-ink: #1f2434;
   --tablet-glow: rgba(255, 255, 255, 0.45);
   --night: 0;
-
 }
 
 .dark {
@@ -227,7 +227,8 @@
 }
 
 html.ready {
-  transition: --water-tint 0.7s,
+  transition:
+    --water-tint 0.7s,
     --water-text 0.7s,
     --sky-top 0.7s,
     --sky-bottom 0.7s,
@@ -423,16 +424,33 @@ body {
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
     /* the bay's shadow across the wings, mirrored */
-    linear-gradient(270deg, rgba(var(--shade), 0.45), rgba(var(--shade), 0.2) 8%, rgba(var(--shade), 0.08) 50%, rgba(var(--shade), 0.05))
+    linear-gradient(
+        270deg,
+        rgba(var(--shade), 0.45),
+        rgba(var(--shade), 0.2) 8%,
+        rgba(var(--shade), 0.08) 50%,
+        rgba(var(--shade), 0.05)
+      )
       left top / var(--wing-w) 100% no-repeat,
-    linear-gradient(90deg, rgba(var(--shade), 0.45), rgba(var(--shade), 0.2) 8%, rgba(var(--shade), 0.08) 50%, rgba(var(--shade), 0.05))
+    linear-gradient(
+        90deg,
+        rgba(var(--shade), 0.45),
+        rgba(var(--shade), 0.2) 8%,
+        rgba(var(--shade), 0.08) 50%,
+        rgba(var(--shade), 0.05)
+      )
       right top / var(--wing-w) 100% no-repeat,
-    /* the quoins, below the quay wall */
-    var(--edge-reflection) left calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
-    var(--edge-reflection) right calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w) var(--edge-h) no-repeat,
+    /* the quoins, below the quay wall */ var(--edge-reflection) left
+      calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w)
+      var(--edge-h) no-repeat,
+    var(--edge-reflection) right
+      calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w)
+      var(--edge-h) no-repeat,
     var(--canal-wings) center var(--rs) / auto 100% repeat-x;
-  background-origin: border-box, content-box, content-box, border-box, border-box, content-box;
-  background-clip: border-box, content-box, content-box, border-box, border-box, content-box;
+  background-origin:
+    border-box, content-box, content-box, border-box, border-box, content-box;
+  background-clip:
+    border-box, content-box, content-box, border-box, border-box, content-box;
 }
 @keyframes reflect {
   from {
@@ -540,7 +558,9 @@ body {
   letter-spacing: 0.01em;
   text-decoration: none;
   text-shadow: 0 1px 0 var(--tablet-glow);
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 .menu a:hover {
   transform: translateY(1px);

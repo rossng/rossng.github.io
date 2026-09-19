@@ -129,17 +129,29 @@
       svg.setAttribute("height", H);
       svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
       const bottom = H - CANAL - BASE_H - 24;
-      const nRows = Math.max(0, Math.floor((bottom - rowTop - WIN_H - 80) / STOREY) + 1);
+      const nRows = Math.max(
+        0,
+        Math.floor((bottom - rowTop - WIN_H - 80) / STOREY) + 1,
+      );
       for (const g of svg.querySelectorAll(".wing")) {
-        for (const r of g.querySelectorAll(".wall")) r.setAttribute("height", H - wallTop);
-        for (const f of g.querySelectorAll(".foot")) f.setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
-        g.querySelector(".edge").setAttribute("height", H - CANAL - CAP_Y - COPING);
+        for (const r of g.querySelectorAll(".wall"))
+          r.setAttribute("height", H - wallTop);
+        for (const f of g.querySelectorAll(".foot"))
+          f.setAttribute("transform", `translate(0 ${H - CANAL - BASE_H})`);
+        g.querySelector(".edge").setAttribute(
+          "height",
+          H - CANAL - CAP_Y - COPING,
+        );
         g.querySelector("mask").setAttribute("height", H);
-        for (const r of g.querySelectorAll(".tall")) r.setAttribute("height", H);
+        for (const r of g.querySelectorAll(".tall"))
+          r.setAttribute("height", H);
         const rows = g.querySelector(".rows");
         while (rows.children.length > nRows) rows.lastElementChild.remove();
         for (let i = rows.children.length; i < nRows; i++)
-          rows.insertAdjacentHTML("beforeend", rowMarkup(builtW, g.dataset.tag, i));
+          rows.insertAdjacentHTML(
+            "beforeend",
+            rowMarkup(builtW, g.dataset.tag, i),
+          );
       }
     }
 
@@ -173,13 +185,13 @@
           `<svg xmlns="http://www.w3.org/2000/svg"><defs>` +
           image("brick", BRICK, TILE_W, TILE_H, patY) +
           image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
-        image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
-        `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
-        `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
-        `<clipPath id="cornerL"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
-        `<clipPath id="cornerR"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
+          image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
+          `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+          `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+          `<clipPath id="cornerL"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
+          `<clipPath id="cornerR"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
           image("base", BASE, BASE_W, BASE_H, 0) +
-            fade("fadeUp", 0.35, 0) +
+          fade("fadeUp", 0.35, 0) +
           `<linearGradient id="quay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6350"/><stop offset=".06" stop-color="#a99c85"/><stop offset=".12" stop-color="#b8ac95"/><stop offset="1" stop-color="#c0b59e"/></linearGradient>` +
           `<pattern id="joints" width="46" height="11" patternUnits="userSpaceOnUse"><path d="M0 10.5H46M23 0V11" stroke="#000" stroke-opacity=".07"/></pattern>` +
           `<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a0f08" stop-opacity=".65"/><stop offset=".08" stop-color="#2a0f08" stop-opacity=".3"/><stop offset=".5" stop-color="#2a0f08" stop-opacity=".12"/><stop offset="1" stop-color="#2a0f08" stop-opacity=".08"/></linearGradient>` +
@@ -196,7 +208,8 @@
       lastH = H;
       // How far the wings still have to travel at the top of the page; the
       // canal uses it to sink their reflection while they sit higher.
-      const f = parseFloat(getComputedStyle(wings).getPropertyValue("--f")) || 0;
+      const f =
+        parseFloat(getComputedStyle(wings).getPropertyValue("--f")) || 0;
       document.documentElement.style.setProperty(
         "--wing-travel",
         `${(((H - innerHeight) * f) / (1 - f)).toFixed(1)}px`,
@@ -234,7 +247,10 @@
         for (const [el, f] of layers)
           el.style.transform = `translateY(${(scrollY * f).toFixed(1)}px)`;
         const max = scrollingElement.scrollHeight - innerHeight;
-        canal.style.setProperty("--reflect-shift", `${(max > 0 ? (1 - scrollY / max) : 0).toFixed(3)}`);
+        canal.style.setProperty(
+          "--reflect-shift",
+          `${(max > 0 ? 1 - scrollY / max : 0).toFixed(3)}`,
+        );
       };
       addEventListener("scroll", () => requestAnimationFrame(update), {
         passive: true,
@@ -281,8 +297,20 @@
       repeat-x;
     opacity: 0.85;
     /* Fade out towards the building's edges rather than stopping dead. */
-    -webkit-mask: linear-gradient(90deg, transparent, #000 160px, #000 calc(100% - 160px), transparent);
-    mask: linear-gradient(90deg, transparent, #000 160px, #000 calc(100% - 160px), transparent);
+    -webkit-mask: linear-gradient(
+      90deg,
+      transparent,
+      #000 160px,
+      #000 calc(100% - 160px),
+      transparent
+    );
+    mask: linear-gradient(
+      90deg,
+      transparent,
+      #000 160px,
+      #000 calc(100% - 160px),
+      transparent
+    );
   }
   .dark .skyline {
     filter: brightness(0.3) saturate(0.6);
@@ -311,9 +339,7 @@
      needed. The layer always reaches the viewport bottom while scrolling. */
   @keyframes lag {
     to {
-      transform: translateY(
-        calc((100% - 100vh) * (var(--f) / (1 - var(--f))))
-      );
+      transform: translateY(calc((100% - 100vh) * (var(--f) / (1 - var(--f)))));
     }
   }
   .skyline,
