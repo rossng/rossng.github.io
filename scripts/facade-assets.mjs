@@ -324,17 +324,25 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
   );
 }
 
-// Provisional pilasters for the bay's sides: eight courses of the parapet's
-// own outer pilaster (mortar-aligned, so they tile), mirrored for the right
-// side. To be replaced by a painted strip in the wall's brick colour.
+// Provisional pilasters for the bay's sides: eight courses of each of the
+// parapet's outer pilasters (mortar-aligned, so they tile). Each side is
+// cropped from its own pilaster so the lighting stays consistent: the
+// right one's chamfer is in shadow. To be replaced by painted strips in
+// the wall's brick colour.
 {
-  const crop = { left: 0, top: 506, width: 144, height: 217 };
+  const width = 144,
+    top = 506,
+    height = 217;
   const scale = (840 * 1.5) / 2172; // same pixel scale as the parapet
-  extra["bay-pilaster-frac"] = (crop.width / 2172).toFixed(4);
-  for (const [name, flop] of [["bay-pilaster-l", false], ["bay-pilaster-r", true]]) {
-    let img = sharp(`${SRC}/baytop.png`).extract(crop);
-    if (flop) img = img.flop();
-    await emit(name, img.resize({ width: Math.round(crop.width * scale) }), (crop.width * 840) / 2172, (crop.height * 840) / 2172, 76);
+  extra["bay-pilaster-frac"] = (width / 2172).toFixed(4);
+  for (const [name, left] of [["bay-pilaster-l", 0], ["bay-pilaster-r", 2172 - width]]) {
+    await emit(
+      name,
+      sharp(`${SRC}/baytop.png`).extract({ left, top, width, height }).resize({ width: Math.round(width * scale) }),
+      (width * 840) / 2172,
+      (height * 840) / 2172,
+      76,
+    );
   }
 }
 
