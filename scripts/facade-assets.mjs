@@ -324,6 +324,20 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
   );
 }
 
+// Provisional pilasters for the bay's sides: eight courses of the parapet's
+// own outer pilaster (mortar-aligned, so they tile), mirrored for the right
+// side. To be replaced by a painted strip in the wall's brick colour.
+{
+  const crop = { left: 0, top: 506, width: 144, height: 217 };
+  const scale = (840 * 1.5) / 2172; // same pixel scale as the parapet
+  extra["bay-pilaster-frac"] = (crop.width / 2172).toFixed(4);
+  for (const [name, flop] of [["bay-pilaster-l", false], ["bay-pilaster-r", true]]) {
+    let img = sharp(`${SRC}/baytop.png`).extract(crop);
+    if (flop) img = img.flop();
+    await emit(name, img.resize({ width: Math.round(crop.width * scale) }), (crop.width * 840) / 2172, (crop.height * 840) / 2172, 76);
+  }
+}
+
 // Distant skyline: 150 CSS px tall, tileable.
 {
   const top = 278,

@@ -35,9 +35,16 @@
   --edge-reflection-w: 32.0px;
   --edge-reflection-h: 151.7px;
   --edge-reflection-aspect: 0.2110;
+  --bay-pilaster-l-w: 55.7px;
+  --bay-pilaster-l-h: 83.9px;
+  --bay-pilaster-l-aspect: 0.6636;
+  --bay-pilaster-r-w: 55.7px;
+  --bay-pilaster-r-h: 83.9px;
+  --bay-pilaster-r-aspect: 0.6636;
   --skyline-w: 680.0px;
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
   --cap-coping: 56.1px;
   --baytop-coping: 0.3834;
+  --bay-pilaster-frac: 0.0663;
 }
