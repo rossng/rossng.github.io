@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./facade-sizes.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -9,7 +10,6 @@
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
   --bay-w: 840px;
-  --canal: 140px;
   --brick: url(/facade/brick.webp);
   --cap: url(/facade/cap.webp);
   --win: url(/facade/window.webp);
@@ -292,8 +292,12 @@ body {
   flex-direction: column;
   width: min(100%, var(--bay-w));
   /* Leave room above the box for the parapet's steps and finial: the box
-     itself begins at the main coping line, 38.3% down the parapet image. */
-  margin: calc(18px + min(100vw, var(--bay-w)) * 0.1095) auto 0;
+     itself begins at the parapet image's main coping line. */
+  margin: calc(
+      18px + min(100vw, var(--bay-w)) / var(--baytop-aspect) *
+        var(--baytop-coping)
+    )
+    auto 0;
   padding: 0 var(--pilaster);
   background:
     linear-gradient(var(--brick-tint), var(--brick-tint)),
@@ -304,7 +308,7 @@ body {
       transparent 90%,
       rgba(0, 0, 0, 0.22)
     ),
-    var(--brick) center top / 152px 144px;
+    var(--brick) center top / var(--brick-w) var(--brick-h);
   box-shadow:
     0 0 0 1px rgba(40, 15, 5, 0.35),
     0 0 48px 6px rgba(40, 12, 0, 0.5),
@@ -316,8 +320,8 @@ body {
   left: 0;
   top: 0;
   width: 100%;
-  aspect-ratio: 2172 / 621;
-  transform: translateY(-38.3%);
+  aspect-ratio: var(--baytop-aspect);
+  transform: translateY(calc(-100% * var(--baytop-coping)));
   background:
     linear-gradient(var(--brick-tint), var(--brick-tint)),
     var(--baytop) center top / 100% 100% no-repeat;
@@ -347,7 +351,7 @@ body {
   height: 78px;
   background:
     linear-gradient(var(--brick-tint), var(--brick-tint)),
-    var(--base) center bottom / 403.7px 77.5px repeat-x;
+    var(--base) center bottom / var(--base-w) var(--base-h) repeat-x;
   -webkit-mask-image: linear-gradient(transparent, #000 35%);
   mask-image: linear-gradient(transparent, #000 35%);
 }
@@ -394,8 +398,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  width: 270px;
-  height: 94px;
+  width: var(--plaque-w);
+  aspect-ratio: var(--plaque-aspect);
   padding: 8px 40px 2px 42px;
   box-sizing: border-box;
   background: var(--plaque) center / 100% 100% no-repeat;
@@ -737,7 +741,6 @@ body {
   }
   .plaque {
     width: 220px;
-    height: 77px;
     padding: 6px 32px 2px 34px;
     font-size: 1.05rem;
   }
