@@ -287,20 +287,17 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   );
 }
 
-// Quoin strip for the building's outer edges: four block pairs between two
-// joints, so it tiles vertically; 32 CSS px wide. Flipped so the shadow
-// falls towards the brick when placed at the outer end of a wing.
+// Pilaster strip for the building's outer edges: two pairs of plain and
+// fluted blocks between matching bands, so it tiles vertically; 32 CSS px
+// wide. It is symmetric, so it serves both corners as is.
+const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
 {
   const w = 32;
-  const s = w / 203;
   await emit(
     "edge",
-    sharp(`${SRC}/edge.png`)
-      .extract({ left: 266, top: 302, width: 203, height: 1507 })
-      .flop()
-      .resize({ width: w * DPR }),
+    sharp(`${SRC}/edge.png`).extract(EDGE_CROP).resize({ width: w * DPR }),
     w,
-    1507 * s,
+    (EDGE_CROP.height * w) / EDGE_CROP.width,
   );
 }
 
@@ -309,8 +306,7 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
 {
   const w = 32;
   const strip = await sharp(`${SRC}/edge.png`)
-    .extract({ left: 266, top: 302, width: 203, height: 1507 })
-    .flop()
+    .extract(EDGE_CROP)
     .flip()
     .resize({ width: w * DPR })
     .blur(0.8)
@@ -324,7 +320,7 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
       { input: { create: { width, height, channels: 4, background: { r: 111, g: 112, b: 94, alpha: 0.45 } } }, blend: "atop" },
     ]),
     w,
-    (1507 * w) / 203,
+    (EDGE_CROP.height * w) / EDGE_CROP.width,
   );
 }
 
