@@ -654,7 +654,7 @@ body {
   background: var(--accent);
 }
 
-.post-list {
+.panel .post-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -966,9 +966,13 @@ body {
   .panel h1 {
     font-size: 1.8rem;
   }
-  .post-list li {
+  .panel .post-list li {
     flex-wrap: wrap;
     gap: 0 0.6rem;
+    padding-left: 1rem;
+  }
+  .post-list li::before {
+    left: 0;
   }
   .post-list a {
     flex-basis: 100%;
