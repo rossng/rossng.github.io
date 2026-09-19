@@ -1,15 +1,19 @@
 ---
-import "@styles/globals.css";
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import Panel from "../components/Panel.astro";
 import { Icon } from "astro-icon/components";
 
-const posts = await getCollection("posts");
+const posts = (await getCollection("posts"))
+  .filter((post) => !post.data.draft)
+  .sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  );
 ---
 
 <Layout title="Ross Gardiner ⌁ Software Engineer" customTitle>
-  <div class="prose">
-    <p>
+  <Panel>
+    <p class="lede">
       I am a software engineer living in Amsterdam, the Netherlands. Right now,
       I work on autonomous robots that build brick walls.
     </p>
@@ -19,49 +23,50 @@ const posts = await getCollection("posts");
       also interested in functional programming and developer tools.
     </p>
 
-    <div class="flex space-x-4">
+    <div class="socials">
       <a
         href="https://github.com/rossng"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="GitHub"
       >
-        <Icon name="mdi:github" class="w-6 h-6" />
+        <Icon name="mdi:github" />
       </a>
       <a
         href="https://www.linkedin.com/in/rngardiner"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="LinkedIn"
       >
-        <Icon name="mdi:linkedin" class="w-6 h-6" />
+        <Icon name="mdi:linkedin" />
       </a>
       <a
         href="https://indieweb.social/@rossng"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="Mastodon"
       >
-        <Icon name="mdi:mastodon" class="w-6 h-6" />
+        <Icon name="mdi:mastodon" />
       </a>
-      <a href="mailto:contact@public.rossng.eu">
-        <Icon name="mdi:email" class="w-6 h-6" />
+      <a href="mailto:contact@public.rossng.eu" aria-label="Email">
+        <Icon name="mdi:email" />
       </a>
     </div>
+  </Panel>
 
-    <h2>Recent Posts</h2>
-    <ul>
+  <Panel>
+    <h2 class="section-title">Recent Posts</h2>
+    <ul class="post-list">
       {
-        posts
-          .sort(
-            (a, b) =>
-              new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-          )
-          .filter((post) => !post.data.draft)
-          .map((post) => (
-            <li>
-              <a href={`/posts/${post.id}`}>{post.data.title}</a> -{" "}
-              {new Date(post.data.date).toISOString().split("T")[0]}
-            </li>
-          ))
+        posts.map((post) => (
+          <li>
+            <a href={`/posts/${post.id}`}>{post.data.title}</a>
+            <time datetime={post.data.date.toISOString()}>
+              {post.data.date.toISOString().split("T")[0]}
+            </time>
+          </li>
+        ))
       }
     </ul>
-  </div>
+  </Panel>
 </Layout>

@@ -1,26 +1,31 @@
 ---
-import Lightswitch from "@components/Lightswitch.astro";
+import { Icon } from "astro-icon/components";
 ---
 
-<header class="bg-white dark:bg-gray-900">
-  <div class="mx-auto flex max-w-7xl items-center justify-between p-4">
-    <div class="flex items-center">
-      <a href="/">
-        <img
-          src="/favicon.svg"
-          alt="Favicon"
-          class="mr-2 h-6 w-6"
-          title="Mysterious U+237C"
-        />
-      </a>
-      <h1 class="text-xl font-bold text-gray-900 dark:text-white">
-        <a href="/">Ross Gardiner</a>
-      </h1>
-    </div>
-    <nav class="flex items-center space-x-4 text-gray-700 dark:text-gray-300">
-      <a href="/posts">Posts</a>
-      <a href="/apps">Apps</a>
-      <Lightswitch />
-    </nav>
-  </div>
+<header class="parapet">
+  <a class="plaque" href="/" title="Mysterious U+237C">
+    <svg class="glyph" viewBox="0 0 9.525 9.525" aria-hidden="true">
+      <path
+        transform="translate(-30.864844,-105.0717)"
+        fill="currentColor"
+        d="m 35.385854,114.5967 -3.000818,-0.86303 0.197943,-3.15126 0.570076,0.83136 -0.06334,1.34601 3.040408,-2.1457 -3.863851,-1.54395 4.711046,-3.29378 0.467147,0.68093 -3.4838,2.40699 3.879685,1.55979 -4.267653,2.98498 1.235165,0.36422 z m 3.602565,-2.58118 -4.568527,0.008 0.0079,-6.94384 0.831362,-0.008 -0.0079,6.10456 3.737166,-0.008 z"
+      ></path>
+    </svg>
+    <span>Ross Gardiner</span>
+  </a>
+  <nav class="menu">
+    <a href="/posts">Posts</a>
+    <a href="/apps">Apps</a>
+    <button class="lantern" id="lightswitch" aria-label="Toggle dark mode">
+      <Icon name="mdi:white-balance-sunny" class="sun" />
+      <Icon name="mdi:weather-night" class="moon" />
+    </button>
+  </nav>
 </header>
+
+<script is:inline>
+  document.getElementById("lightswitch").addEventListener("click", () => {
+    const dark = document.documentElement.classList.toggle("dark");
+    localStorage.theme = dark ? "dark" : "light";
+  });
+</script>

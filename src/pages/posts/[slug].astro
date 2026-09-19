@@ -1,7 +1,7 @@
 ---
-import "@styles/globals.css";
 import { getCollection, getEntry, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import Panel from "../../components/Panel.astro";
 import PostMeta from "../../components/PostMeta.astro";
 
 const { slug } = Astro.params;
@@ -23,16 +23,19 @@ import { Comments } from "@components/Comments";
 ---
 
 <Layout title={post.data.title}>
-  <PostMeta
-    title={`${post.data.draft ? "DRAFT: " : ""} ${post.data.title}`}
-    date={post.data.date}
-  />
-  <Content />
-  {
-    !post.data.disableComments && !post.data.draft && (
-      <div class="mt-12">
-        <Comments client:load />
-      </div>
-    )
-  }
+  <Panel>
+    <a class="backlink" href="/posts">&larr; All posts</a>
+    <PostMeta
+      title={`${post.data.draft ? "DRAFT: " : ""} ${post.data.title}`}
+      date={post.data.date}
+    />
+    <Content />
+    {
+      !post.data.disableComments && !post.data.draft && (
+        <div class="mt-12">
+          <Comments client:load />
+        </div>
+      )
+    }
+  </Panel>
 </Layout>

@@ -1,0 +1,11 @@
+---
+// A plastered opening in the brick facade. Content lives inside these.
+interface Props {
+  class?: string;
+}
+const { class: cls = "" } = Astro.props;
+---
+
+<section class:list={["panel", cls]}>
+  <slot />
+</section>
