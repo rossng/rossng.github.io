@@ -17,6 +17,7 @@
   --plaque: url(/facade/plaque.webp);
   --skyline: url(/facade/skyline.webp);
   --canal-img: url(/facade/canal.webp);
+  --canal-sky: url(/facade/canal-sky.webp);
   --baytop: url(/facade/baytop.webp);
   --water-tint: rgba(0, 0, 0, 0);
   --water-text: rgba(255, 248, 232, 0.85);
@@ -818,6 +819,19 @@ body {
   }
   .parapet {
     padding-top: 22px;
+  }
+  /* No wings beside the bay here, so the water outside it reflects sky. */
+  .canal {
+    background:
+      linear-gradient(var(--water-tint), var(--water-tint)),
+      var(--canal-img) center top / auto 100% repeat-x,
+      var(--canal-sky) center top / auto 100% repeat-x;
+    background-size:
+      auto,
+      auto 100%,
+      auto 100%;
+    background-clip: border-box, content-box, border-box;
+    padding-inline: max(0px, calc((100% - var(--bay-w)) / 2));
   }
   .parapet {
     padding: 16px 2px 14px;
