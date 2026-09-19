@@ -29,7 +29,7 @@ import { Comments } from "@components/Comments";
     <Content />
     {
       !post.data.disableComments && !post.data.draft && (
-        <div class="mt-12">
+        <div class="comments">
           <Comments client:load />
         </div>
       )
