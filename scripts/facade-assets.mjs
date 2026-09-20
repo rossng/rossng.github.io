@@ -102,13 +102,65 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
   );
 }
 
+// The water's ripple: how far to the right, in CSS px, the reflection at
+// `yCss` px down the canal band samples from (so an edge appears that far to
+// the left). The water begins under the quay coping. Everything reflected -
+// the tiles, the quoin and pilaster strips, and the reflection layers' edges
+// (as a clip-path) - is bent with this one function so they wave together.
+const WATER_TOP = 20; // CSS px, the quay coping in the canal tile
+const RIPPLE_SCALE = 1.5; // canal tile output pixels per CSS px
+const rippleDx = (yCss) => {
+  const y = (yCss - WATER_TOP) * RIPPLE_SCALE;
+  const depth = y / ((CANAL_H - WATER_TOP) * RIPPLE_SCALE);
+  return (
+    ((2 + 5 * depth) * Math.sin(y / 3.1) +
+      (1 + 3 * depth) * Math.sin(y / 7.7 + 1.3)) /
+    RIPPLE_SCALE
+  );
+};
+// Bend a reflection strip (PNG at DPR px) whose top sits `topCss` px down
+// the canal band.
+async function rippled(png, topCss) {
+  const { data, info } = await sharp(png)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const { width: w, height: h } = info;
+  const out = Buffer.alloc(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    const dx = Math.round(rippleDx(topCss + y / DPR) * DPR);
+    for (let x = 0; x < w; x++) {
+      const sx = x + dx;
+      if (sx >= 0 && sx < w)
+        data.copy(out, (y * w + x) * 4, (y * w + sx) * 4, (y * w + sx + 1) * 4);
+    }
+  }
+  return sharp(out, { raw: { width: w, height: h, channels: 4 } });
+}
+// The reflection layers are RIPPLE_INSET wider than what they reflect on
+// each side, so the clip can wave outward as well as in.
+const RIPPLE_INSET = 8;
+{
+  const pts = [];
+  for (let y = WATER_TOP; y <= CANAL_H; y += 2) pts.push(y);
+  const right = pts.map(
+    (y) => `calc(100% - ${(RIPPLE_INSET + rippleDx(y)).toFixed(1)}px) ${y}px`,
+  );
+  const left = pts
+    .reverse()
+    .map((y) => `${(RIPPLE_INSET - rippleDx(y)).toFixed(1)}px ${y}px`);
+  extra["ripple-inset"] = `${RIPPLE_INSET}px`;
+  extra["water-ripple"] =
+    `polygon(${RIPPLE_INSET}px 0, calc(100% - ${RIPPLE_INSET}px) 0, ${right.join(", ")}, ${left.join(", ")})`;
+}
+
 // Canal: the quay edge from the painting, and beneath it water that reflects
 // what actually stands at the water's edge (quay wall, hedge, plinth, brick),
 // mirrored, rippled, smeared and tinted with the painting's water colour.
 {
-  const SCALE = 1.5; // output pixels per CSS px
+  const SCALE = RIPPLE_SCALE; // output pixels per CSS px
   const h = CANAL_H;
-  const quayH = Math.round(20 * SCALE);
+  const quayH = Math.round(WATER_TOP * SCALE);
   const H = Math.round(h * SCALE);
   const waterH = H - quayH;
 
@@ -191,10 +243,7 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
     const px = (x, y) => (((y + waterH) % waterH) * W + ((x + W) % W)) * 4;
     for (let y = 0; y < waterH; y++) {
       const depth = y / waterH;
-      const dx = Math.round(
-        (2 + 5 * depth) * Math.sin(y / 3.1) +
-          (1 + 3 * depth) * Math.sin(y / 7.7 + 1.3),
-      );
+      const dx = Math.round(rippleDx(WATER_TOP + y / SCALE) * SCALE);
       const smear = 1 + Math.round(3 * depth);
       const t = 0.32 + 0.4 * depth; // how much water colour
       const dark = 0.9 - 0.25 * depth;
@@ -321,9 +370,8 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
     .png()
     .toBuffer();
   const { width, height } = await sharp(strip).metadata();
-  await emit(
-    "edge-reflection",
-    sharp(strip).composite([
+  const tinted = await sharp(strip)
+    .composite([
       {
         input: {
           create: {
@@ -335,7 +383,13 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
         },
         blend: "atop",
       },
-    ]),
+    ])
+    .png()
+    .toBuffer();
+  // Starts below the quay wall's reflection (--quay-h + --quay-wall).
+  await emit(
+    "edge-reflection",
+    await rippled(tinted, WATER_TOP + 13),
     w,
     (EDGE_CROP.height * w) / EDGE_CROP.width,
   );
@@ -400,9 +454,8 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
       .png()
       .toBuffer();
     const meta = await sharp(strip).metadata();
-    await emit(
-      name,
-      sharp(strip).composite([
+    const tinted = await sharp(strip)
+      .composite([
         {
           input: {
             create: {
@@ -414,7 +467,15 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
           },
           blend: "atop",
         },
-      ]),
+      ])
+      .png()
+      .toBuffer();
+    // Bent for its place in the water at full bay width (see --pilaster-y).
+    const depth =
+      WATER_TOP + 13 + 44 * Number(extra["plinth-reflection-scale"]);
+    await emit(
+      name,
+      await rippled(tinted, depth),
       (width * 840) / 2172,
       (height * 3 * 840) / 2172,
       76,

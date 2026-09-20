@@ -399,6 +399,7 @@ body {
   width: min(100%, var(--building-w));
   margin-inline: auto;
   height: var(--canal);
+  overflow: hidden; /* the reflection layers overhang it by --ripple-inset */
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
     var(--canal-sky) center top / auto 100% repeat-x;
@@ -412,43 +413,52 @@ body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  /* The layers' side edges (bay against wings, building against sky) wave
+     with the same ripple that is baked into the reflection images. Each
+     layer is --ripple-inset wider than its subject on both sides and the
+     polygon is inset by as much, so the edge can wave both ways. */
+  clip-path: var(--water-ripple);
   pointer-events: none;
 }
 /* The wings lag the page, so while they sit higher than the bay their
    reflection sits correspondingly deeper: the layer is offset by the wings'
    remaining travel, driven by the same scroll timeline. */
 .canal::before {
-  width: min(100%, var(--building-w));
+  width: calc(min(100%, var(--building-w)) + 2 * var(--ripple-inset));
   box-sizing: border-box;
   /* The brick reflection is inset like the brick above it; the quoins sit
      at the very edge, starting below the quay wall's reflection. */
-  padding-inline: var(--corner-inset);
+  padding-inline: calc(var(--corner-inset) + var(--ripple-inset));
   --reflect-shift: 0;
   --rs: calc(var(--wing-travel, 0px) * var(--reflect-shift));
+  /* Of the content box, which is inset from the wings' outer edges by
+     --corner-inset: the wing's width less that. */
   --wing-w: calc((100% - var(--bay-w)) / 2);
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
-    /* the bay's shadow across the wings, mirrored */
+    /* the bay's shadow across the wings, mirrored; its dark end continues
+       under the bay's layer so the waving bay edge shows against it */
     linear-gradient(
         270deg,
-        rgba(var(--shade), 0.45),
-        rgba(var(--shade), 0.2) 8%,
+        rgba(var(--shade), 0.45) var(--ripple-inset),
+        rgba(var(--shade), 0.2) calc(var(--ripple-inset) + 8%),
         rgba(var(--shade), 0.08) 50%,
         rgba(var(--shade), 0.05)
       )
-      left top / var(--wing-w) 100% no-repeat,
+      left top / calc(var(--wing-w) + 2 * var(--ripple-inset)) 100% no-repeat,
     linear-gradient(
         90deg,
-        rgba(var(--shade), 0.45),
-        rgba(var(--shade), 0.2) 8%,
+        rgba(var(--shade), 0.45) var(--ripple-inset),
+        rgba(var(--shade), 0.2) calc(var(--ripple-inset) + 8%),
         rgba(var(--shade), 0.08) 50%,
         rgba(var(--shade), 0.05)
       )
-      right top / var(--wing-w) 100% no-repeat,
+      right top / calc(var(--wing-w) + 2 * var(--ripple-inset)) 100% no-repeat,
     /* the quoins, below the quay wall */ var(--edge-reflection) left
+      var(--ripple-inset) top
       calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w)
       var(--edge-h) no-repeat,
-    var(--edge-reflection) right
+    var(--edge-reflection) right var(--ripple-inset) top
       calc(var(--quay-h) + var(--quay-wall) + var(--rs)) / var(--edge-w)
       var(--edge-h) no-repeat,
     var(--canal-wings) center var(--rs) / auto 100% repeat-x;
@@ -488,7 +498,9 @@ body {
    reflected one. The reflection strips are tall enough to reach the bottom
    of the canal at any bay width, so they need not repeat. */
 .canal::after {
-  width: min(100%, var(--bay-w));
+  width: calc(min(100%, var(--bay-w)) + 2 * var(--ripple-inset));
+  padding-inline: var(--ripple-inset);
+  box-sizing: border-box;
   --pw: calc(100% * var(--bay-pilaster-frac));
   --pilaster-y: calc(
     var(--quay-h) + var(--quay-wall) + var(--pilaster-foot) *
@@ -501,6 +513,8 @@ body {
     var(--bay-pilaster-r-reflection) right var(--pilaster-y) / var(--pw) auto
       no-repeat,
     var(--canal-img) center top / auto 100% repeat-x;
+  background-origin: border-box, content-box, content-box, border-box;
+  background-clip: border-box, border-box, border-box, border-box;
 }
 .canal a {
   z-index: 1;
