@@ -146,6 +146,11 @@ async function emit(name, pipeline, displayW, displayH, quality = 84) {
       .resize({ width: Math.round(W / 7) })
       .flip(),
   );
+  // The plinth's reflection is smaller than the plinth; the bay's pilaster
+  // reflections are placed by this ratio.
+  extra["plinth-reflection-scale"] = (base.h / SCALE / sizes.base[1]).toFixed(
+    3,
+  );
 
   // Two scenes: what stands above the water where the building is (quay
   // wall, hedge, brick), and where only sky is (beside the bay on narrow
@@ -358,6 +363,60 @@ const EDGE_CROP = { left: 312, top: 273, width: 169, height: 801 };
         .resize({ width: Math.round(width * scale) }),
       (width * 840) / 2172,
       (height * 840) / 2172,
+      76,
+    );
+  }
+}
+
+// The bay's pilasters as seen in the canal: three courses of tiles stacked
+// so one image spans the water at any bay width, then mirrored, softened
+// and tinted like the quoins' reflection.
+{
+  const width = 144,
+    top = 506,
+    height = 217;
+  const scale = (840 * 1.5) / 2172;
+  for (const [name, left] of [
+    ["bay-pilaster-l-reflection", 0],
+    ["bay-pilaster-r-reflection", 2172 - width],
+  ]) {
+    const tile = await sharp(`${SRC}/baytop.png`)
+      .extract({ left, top, width, height })
+      .png()
+      .toBuffer();
+    const stacked = await sharp({
+      create: { width, height: height * 3, channels: 4, background: "#0000" },
+    })
+      .composite(
+        [0, 1, 2].map((i) => ({ input: tile, top: i * height, left: 0 })),
+      )
+      .png()
+      .toBuffer();
+    const strip = await sharp(stacked)
+      .flip()
+      .resize({ width: Math.round(width * scale) })
+      .blur(0.8)
+      .modulate({ brightness: 0.8, saturation: 0.75 })
+      .png()
+      .toBuffer();
+    const meta = await sharp(strip).metadata();
+    await emit(
+      name,
+      sharp(strip).composite([
+        {
+          input: {
+            create: {
+              width: meta.width,
+              height: meta.height,
+              channels: 4,
+              background: { r: 111, g: 112, b: 94, alpha: 0.45 },
+            },
+          },
+          blend: "atop",
+        },
+      ]),
+      (width * 840) / 2172,
+      (height * 3 * 840) / 2172,
       76,
     );
   }

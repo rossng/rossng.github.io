@@ -41,10 +41,17 @@
   --bay-pilaster-r-w: 55.7px;
   --bay-pilaster-r-h: 83.9px;
   --bay-pilaster-r-aspect: 0.6636;
+  --bay-pilaster-l-reflection-w: 55.7px;
+  --bay-pilaster-l-reflection-h: 251.8px;
+  --bay-pilaster-l-reflection-aspect: 0.2212;
+  --bay-pilaster-r-reflection-w: 55.7px;
+  --bay-pilaster-r-reflection-h: 251.8px;
+  --bay-pilaster-r-reflection-aspect: 0.2212;
   --skyline-w: 680.0px;
   --skyline-h: 150.0px;
   --skyline-aspect: 4.5336;
   --cap-coping: 56.1px;
+  --plinth-reflection-scale: 0.834;
   --baytop-coping: 0.3834;
   --bay-pilaster-frac: 0.0663;
 }

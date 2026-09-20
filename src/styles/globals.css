@@ -30,6 +30,9 @@
   --baytop: url(/facade/baytop.webp);
   --bay-pilaster-l: url(/facade/bay-pilaster-l.webp);
   --bay-pilaster-r: url(/facade/bay-pilaster-r.webp);
+  --bay-pilaster-l-reflection: url(/facade/bay-pilaster-l-reflection.webp);
+  --bay-pilaster-r-reflection: url(/facade/bay-pilaster-r-reflection.webp);
+  --pilaster-foot: 44px; /* the bay's pilasters end this far up the plinth */
   --water-tint: rgba(0, 0, 0, 0);
   --water-text: rgba(255, 248, 232, 0.85);
   --pilaster: 44px;
@@ -348,7 +351,7 @@ body {
     min(100vw, var(--bay-w)) / var(--baytop-aspect) *
       (1 - var(--baytop-coping)) - 1px
   );
-  bottom: 44px;
+  bottom: var(--pilaster-foot);
   --pw: calc(100% * var(--bay-pilaster-frac));
   /* The strips are opaque, so the night tint is simply two more strips over
      them: no mask. Firefox has no GPU path for a CSS mask and rasterises the
@@ -480,10 +483,23 @@ body {
     animation: none;
   }
 }
+/* The bay's pilasters appear in the water where the plinth's reflection has
+   reached their feet: --pilaster-foot up the real plinth, scaled to the
+   reflected one. The reflection strips are tall enough to reach the bottom
+   of the canal at any bay width, so they need not repeat. */
 .canal::after {
   width: min(100%, var(--bay-w));
+  --pw: calc(100% * var(--bay-pilaster-frac));
+  --pilaster-y: calc(
+    var(--quay-h) + var(--quay-wall) + var(--pilaster-foot) *
+      var(--plinth-reflection-scale)
+  );
   background:
     linear-gradient(var(--water-tint), var(--water-tint)),
+    var(--bay-pilaster-l-reflection) left var(--pilaster-y) / var(--pw) auto
+      no-repeat,
+    var(--bay-pilaster-r-reflection) right var(--pilaster-y) / var(--pw) auto
+      no-repeat,
     var(--canal-img) center top / auto 100% repeat-x;
 }
 .canal a {
