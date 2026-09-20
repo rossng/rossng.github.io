@@ -338,7 +338,7 @@ body {
 }
 
 /* The parapet's outer pilasters continue down the bay's sides to the
-   plinth. The strips double as the mask so the night tint only covers them. */
+   plinth. */
 .bay::after {
   content: "";
   position: absolute;
@@ -350,14 +350,16 @@ body {
   );
   bottom: 44px;
   --pw: calc(100% * var(--bay-pilaster-frac));
+  /* The strips are opaque, so the night tint is simply two more strips over
+     them: no mask. Firefox has no GPU path for a CSS mask and rasterises the
+     masked element on the CPU, tile by tile at device resolution, as it
+     scrolls into view; on this page-tall element that stalled scrolling on
+     phones. */
   background:
-    linear-gradient(var(--brick-tint), var(--brick-tint)),
-    var(--bay-pilaster-l) left top / var(--pw) auto repeat-y,
-    var(--bay-pilaster-r) right top / var(--pw) auto repeat-y;
-  -webkit-mask:
-    var(--bay-pilaster-l) left top / var(--pw) auto repeat-y,
-    var(--bay-pilaster-r) right top / var(--pw) auto repeat-y;
-  mask:
+    linear-gradient(var(--brick-tint), var(--brick-tint)) left top / var(--pw)
+      100% no-repeat,
+    linear-gradient(var(--brick-tint), var(--brick-tint)) right top /
+      calc(var(--pw) - 1px) 100% no-repeat,
     var(--bay-pilaster-l) left top / var(--pw) auto repeat-y,
     var(--bay-pilaster-r) right top / var(--pw) auto repeat-y;
   pointer-events: none;

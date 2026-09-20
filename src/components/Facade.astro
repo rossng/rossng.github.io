@@ -246,7 +246,7 @@
       const update = () => {
         for (const [el, f] of layers)
           el.style.transform = `translateY(${(scrollY * f).toFixed(1)}px)`;
-        const max = scrollingElement.scrollHeight - innerHeight;
+        const max = document.scrollingElement.scrollHeight - innerHeight;
         canal.style.setProperty(
           "--reflect-shift",
           `${(max > 0 ? 1 - scrollY / max : 0).toFixed(3)}`,
