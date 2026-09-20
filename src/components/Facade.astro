@@ -87,8 +87,9 @@
       // Night tint and the shadow cast by the bay, clipped to the wall's
       // silhouette (the parapet has sky between its steps). The mask repeats
       // the silhouette with plain shapes: Chrome mis-renders a mask whose
-      // content is a <use> of a group containing masked elements.
-      `<mask id="m${tag}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}">` +
+      // content is a <use> of a group containing masked elements. It goes by
+      // alpha, not luminance, so the mid-toned parapet is tinted in full.
+      `<mask id="m${tag}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" style="mask-type:alpha">` +
       `<rect class="wall" y="${wallTop}" width="${W}" fill="#fff"/>` +
       `<rect y="${CAP_Y}" width="${W - EDGE_W}" height="${CAP_H}" fill="url(#capAlpha)"/>` +
       `<rect x="${W - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${CAP_H - COPING}" fill="#fff"/>` +
@@ -113,8 +114,13 @@
         const x = Math.round((W - WIN_W) / 2 + (r() - 0.5) * 24);
         const lit = (0.15 + r() * 0.85).toFixed(2);
         if (present) {
+          // The left wing is mirrored as a whole; flip its windows back.
+          const flip =
+            tag === "L"
+              ? ` transform="translate(${2 * x + WIN_W} 0) scale(-1 1)"`
+              : "";
           s += `<ellipse class="glow" style="--lit:${lit}" cx="${x + WIN_W / 2}" cy="${y + WIN_H / 2}" rx="${WIN_W * 1.6}" ry="${WIN_H * 0.8}" fill="url(#glow)"/>`;
-          s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"/>`;
+          s += `<image class="win" style="--lit:${lit}" href="${WIN}" x="${x}" y="${y}" width="${WIN_W}" height="${WIN_H}"${flip}/>`;
         }
       }
       return s + `</g>`;
@@ -186,7 +192,8 @@
           image("brick", BRICK, TILE_W, TILE_H, patY) +
           image("cap", CAP, CAP_W, CAP_H, CAP_Y) +
           image("capAlpha", CAP, CAP_W, CAP_H, CAP_Y) +
-          `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
+          // The left wing is mirrored as a whole; flip its quoins back.
+          `<pattern id="edgeL" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}" transform="translate(${EDGE_W} 0) scale(-1 1)"/></pattern>` +
           `<pattern id="edgeR" x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="${EDGE_H}" patternUnits="userSpaceOnUse"><image href="${EDGE}" width="${EDGE_W}" height="${EDGE_H}"/></pattern>` +
           `<clipPath id="cornerL"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +
           `<clipPath id="cornerR"><rect width="${wingW - EDGE_W}" height="99999"/><rect x="${wingW - EDGE_W}" y="${CAP_Y + COPING}" width="${EDGE_W}" height="99999"/></clipPath>` +

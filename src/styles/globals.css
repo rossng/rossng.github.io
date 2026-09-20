@@ -358,8 +358,8 @@ body {
   background:
     linear-gradient(var(--brick-tint), var(--brick-tint)) left top / var(--pw)
       100% no-repeat,
-    linear-gradient(var(--brick-tint), var(--brick-tint)) right top /
-      calc(var(--pw) - 1px) 100% no-repeat,
+    linear-gradient(var(--brick-tint), var(--brick-tint)) right top / var(--pw)
+      100% no-repeat,
     var(--bay-pilaster-l) left top / var(--pw) auto repeat-y,
     var(--bay-pilaster-r) right top / var(--pw) auto repeat-y;
   pointer-events: none;
