@@ -523,7 +523,8 @@ body {
   gap: 0.45rem;
   width: var(--plaque-w);
   aspect-ratio: var(--plaque-aspect);
-  padding: 8px 40px 2px 42px;
+  /* Vertical padding matches the sunken panel below the arch. */
+  padding: 27px 40px 14px 42px;
   box-sizing: border-box;
   background: var(--plaque) center / 100% 100% no-repeat;
   filter: drop-shadow(0 6px 10px rgba(30, 10, 0, 0.5))
@@ -972,7 +973,7 @@ body {
   }
   .plaque {
     width: 220px;
-    padding: 6px 32px 2px 34px;
+    padding: 22px 32px 11px 34px;
     font-size: 1.05rem;
   }
   .menu {
