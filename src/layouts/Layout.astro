@@ -48,23 +48,27 @@ const fullTitle = customTitle ? title : `${title} ⌁ Ross Gardiner`;
     <meta property="og:url" content={Astro.url} />
     {description && <meta property="og:description" content={description} />}
     <script is:inline>
-      const applyTheme = () =>
-        document.documentElement.classList.toggle(
+      const applyTheme = (root) =>
+        root.classList.toggle(
           "dark",
           localStorage.theme === "dark" ||
             (!("theme" in localStorage) &&
               matchMedia("(prefers-color-scheme: dark)").matches)
         );
-      applyTheme();
+      applyTheme(document.documentElement);
       requestAnimationFrame(() =>
         requestAnimationFrame(() =>
           document.documentElement.classList.add("ready")
         )
       );
-      // The client router swaps <html>'s attributes on navigation.
-      document.addEventListener("astro:after-swap", () => {
-        applyTheme();
-        document.documentElement.classList.add("ready");
+      // The client router replaces <html>'s attributes with the new page's.
+      // Put the classes on the incoming document so they are never removed:
+      // restoring them afterwards would let a style recalc see the page
+      // without them, and the theme colours would then fade in from light.
+      document.addEventListener("astro:before-swap", (e) => {
+        const root = e.newDocument.documentElement;
+        applyTheme(root);
+        root.classList.add("ready");
       });
       addEventListener("click", (e) => {
         if (!e.target.closest("#lightswitch")) return;
