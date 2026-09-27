@@ -25,6 +25,7 @@ export default defineConfig({
     "/projects/2018/08/10/thesis-free-trade.html":
       "/posts/2018-08-10-free-trade",
     "/projects/2017/06/05/loan-shark.html": "/posts/2017-06-05-loan-shark",
+    "/giggle": "https://giggle.rossng.workers.dev/",
     "/meze": "https://meze.rossng.workers.dev/",
   },
 
